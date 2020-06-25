@@ -3,16 +3,14 @@ reviewers:
 - derekwaynecarr
 title: Manage HugePages
 content_type: task
+description: Configure and manage huge pages as a schedulable resource in a cluster.
 ---
 
 <!-- overview -->
 {{< feature-state state="stable" >}}
 
 Kubernetes supports the allocation and consumption of pre-allocated huge pages
-by applications in a Pod as a **GA** feature. This page describes how users
-can consume huge pages and the current limitations.
-
-
+by applications in a Pod. This page describes how users can consume huge pages.
 
 ## {{% heading "prerequisites" %}}
 
@@ -120,11 +118,3 @@ gate](/docs/reference/command-line-tools-reference/feature-gates/) on the {{<
 glossary_tooltip text="kubelet" term_id="kubelet" >}} and {{<
 glossary_tooltip text="kube-apiserver"
 term_id="kube-apiserver" >}} (`--feature-gates=HugePageStorageMediumSize=true`).
-
-## Future
-
-- NUMA locality guarantees as a feature of quality of service.
-- LimitRange support.
-
-
-
