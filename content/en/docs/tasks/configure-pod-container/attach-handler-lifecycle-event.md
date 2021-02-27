@@ -9,7 +9,7 @@ weight: 140
 This page shows how to attach handlers to Container lifecycle events. Kubernetes supports
 the postStart and preStop events. Kubernetes sends the postStart event immediately
 after a Container is started, and it sends the preStop event immediately before the
-Container is terminated.
+Container is terminated. A Container may specify one handler per event.
 
 
 
@@ -75,7 +75,7 @@ set to RUNNING until the postStart handler completes.
 Kubernetes sends the preStop event immediately before the Container is terminated.
 Kubernetes' management of the Container blocks until the preStop handler completes,
 unless the Pod's grace period expires. For more details, see
-[Termination of Pods](/docs/concepts/workloads/pods/pod/#termination-of-pods).
+[Pod Lifecycle](/docs/concepts/workloads/pods/pod-lifecycle/).
 
 {{< note >}}
 Kubernetes only sends the preStop event when a Pod is *terminated*.

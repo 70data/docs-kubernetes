@@ -52,7 +52,7 @@ Kamu dapat menambahkan parameter `--previous` pada perintah `kubectl logs` untuk
 
 ![Node-level _logging_](/images/docs/user-guide/logging/logging-node-level.png)
 
-Semua hal yang ditulis oleh aplikasi dalam kontainer ke `stdout` dan `stderr` akan ditangani dan diarahkan ke suatu tempat oleh mesin atau _engine_ kontainer. Contohnya,mesin kontainer Docker akan mengarahkan kedua aliran tersebut ke [suatu _logging driver_](https://docs.docker.com/engine/admin/logging/overview), yang akan dikonfigurasi pada Kubernetes untuk menuliskan ke dalam file dalam format json.
+Semua hal yang ditulis oleh aplikasi dalam kontainer ke `stdout` dan `stderr` akan ditangani dan diarahkan ke suatu tempat oleh mesin atau _engine_ kontainer. Contohnya,mesin kontainer Docker akan mengarahkan kedua aliran tersebut ke [suatu _logging driver_](https://docs.docker.com/engine/admin/logging/overview), yang akan dikonfigurasi pada Kubernetes untuk menuliskan ke dalam berkas dalam format json.
 
 {{< note >}}
 _Logging driver_ json dari Docker memperlakukan tiap baris sebagai pesan yang terpisah. Saat menggunakan _logging driver_ Docker, tidak ada dukungan untuk menangani pesan _multi-line_. Kamu harus menangani pesan _multi-line_ pada level agen log atau yang lebih tinggi.
@@ -173,7 +173,7 @@ Menggunakan agen _logging_ di dalam kontainer _sidecar_ dapat berakibat pengguna
 {{< /note >}}
 
 Sebagai contoh, kamu dapat menggunakan [Stackdriver](/docs/tasks/debug-application-cluster/logging-stackdriver/),
-yang menggunakan fluentd sebagai agen _logging_. Berikut ini dua _file_ konfigurasi yang dapat kamu pakai untuk mengimplementasikan cara ini. _File_ yang pertama berisi sebuah [ConfigMap](/docs/tasks/configure-pod-container/configure-pod-configmap/) untuk mengonfigurasi fluentd.
+yang menggunakan fluentd sebagai agen _logging_. Berikut ini dua _file_ konfigurasi yang dapat kamu pakai untuk mengimplementasikan cara ini. _File_ yang pertama berisi sebuah [ConfigMap](/id/docs/tasks/configure-pod-container/configure-pod-configmap/) untuk mengonfigurasi fluentd.
 
 {{< codenew file="admin/logging/fluentd-sidecar-config.yaml" >}}
 

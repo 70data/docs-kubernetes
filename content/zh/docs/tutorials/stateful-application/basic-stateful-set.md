@@ -33,7 +33,7 @@ following Kubernetes concepts.
 
 在开始本教程之前，你应该熟悉以下 Kubernetes 的概念：
 
-* [Pods](/zh/docs/user-guide/pods/single-container/)
+* [Pods](/zh/docs/concepts/workloads/pods/)
 * [Cluster DNS](/zh/docs/concepts/services-networking/dns-pod-service/)
 * [Headless Services](/zh/docs/concepts/services-networking/service/#headless-services)
 * [PersistentVolumes](/zh/docs/concepts/storage/persistent-volumes/)
@@ -867,12 +867,12 @@ Patch the StatefulSet to decrement the partition.
 请注意，虽然更新策略是 `RollingUpdate`，StatefulSet 控制器还是会使用原始的容器恢复 Pod。这是因为 Pod 的序号比 `updateStrategy` 指定的 `partition` 更小。
 
 
-#### 灰度扩容
+#### 灰度发布
 
-你可以通过减少 [上文](#分段更新)指定的 `partition` 来进行灰度扩容，以此来测试你的程序的改动。
+你可以通过减少 [上文](#分段更新)指定的 `partition` 来进行灰度发布，以此来测试你的程序的改动。
 
 
-Patch StatefulSet 来减少分区。
+通过 patch 命令修改 StatefulSet 来减少分区。
 
 ```shell
 kubectl patch statefulset web -p '{"spec":{"updateStrategy":{"type":"RollingUpdate","rollingUpdate":{"partition":2}}}}'
@@ -977,9 +977,9 @@ The partition is currently set to `2`. Set the partition to `0`.
 `web-1` 被按照原来的配置恢复，因为 Pod 的序号小于分区。当指定了分区时，如果更新了 StatefulSet 的 `.spec.template`，则所有序号大于或等于分区的 Pod 都将被更新。如果一个序号小于分区的 Pod 被删除或者终止，它将被按照原来的配置恢复。
 
 
-#### 分阶段的扩容
+#### 分阶段的发布
 
-你可以使用类似[灰度扩容](#灰度扩容)的方法执行一次分阶段的扩容（例如一次线性的、等比的或者指数形式的扩容）。要执行一次分阶段的扩容，你需要设置 `partition` 为希望控制器暂停更新的序号。
+你可以使用类似[灰度发布](#灰度发布)的方法执行一次分阶段的发布（例如一次线性的、等比的或者指数形式的发布）。要执行一次分阶段的发布，你需要设置 `partition` 为希望控制器暂停更新的序号。
 
 
 分区当前为`2`。请将分区设置为`0`。
@@ -1319,13 +1319,19 @@ Finally delete the `web` StatefulSet and the `nginx` service.
 即使你已经删除了 StatefulSet 和它的全部 Pod，这些 Pod 将会被重新创建并挂载它们的 PersistentVolumes，并且 `web-0` 和 `web-1` 将仍然使用它们的主机名提供服务。
 
 
-最后删除 `web` StatefulSet 和 `nginx` service。
+最后删除 `nginx` service...
 
 ```shell
 kubectl delete service nginx
+```
+```
 service "nginx" deleted
-
+```
+... 并且删除 `web` StatefulSet:
+```shell
 kubectl delete statefulset web
+```
+```
 statefulset "web" deleted
 ```
 

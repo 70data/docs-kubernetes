@@ -8,16 +8,12 @@ weight: 10
 
 {{< feature-state for_k8s_version="v1.15" state="stable" >}}
 
-[kubeadm](/docs/reference/setup-tools/kubeadm/kubeadm/)으로 생성된 클라이언트 인증서는 1년 후에 만료된다. 이 페이지는 kubeadm으로 인증서 갱신을 관리하는 방법을 설명한다.
-
-
+[kubeadm](/ko/docs/reference/setup-tools/kubeadm/)으로 생성된 클라이언트 인증서는 1년 후에 만료된다. 이 페이지는 kubeadm으로 인증서 갱신을 관리하는 방법을 설명한다.
 
 ## {{% heading "prerequisites" %}}
 
 
 [쿠버네티스의 PKI 인증서와 요구 조건](/ko/docs/setup/best-practices/certificates/)에 익숙해야 한다.
-
-
 
 <!-- steps -->
 
@@ -54,7 +50,7 @@ CA 키없이 진행한다.
 `check-expiration` 하위 명령을 사용하여 인증서가 만료되는 시기를 확인할 수 있다.
 
 ```
-kubeadm alpha certs check-expiration
+kubeadm certs check-expiration
 ```
 
 출력 결과는 다음과 비슷하다.
@@ -122,7 +118,7 @@ kubeadm 1.17 이전 버전에는 `kubeadm upgrade node` 명령에서
 
 ## 수동 인증서 갱신
 
-`kubeadm alpha certs renew` 명령을 사용하여 언제든지 인증서를 수동으로 갱신할 수 있다.
+`kubeadm certs renew` 명령을 사용하여 언제든지 인증서를 수동으로 갱신할 수 있다.
 
 이 명령은 `/etc/kubernetes/pki` 에 저장된 CA(또는 프론트 프록시 CA) 인증서와 키를 사용하여 갱신을 수행한다.
 
@@ -131,10 +127,10 @@ HA 클러스터를 실행 중인 경우, 모든 컨트롤 플레인 노드에서
 {{< /warning >}}
 
 {{< note >}}
-`alpha certs renew` 는 기존 인증서를 kubeadm-config 컨피그맵(ConfigMap) 대신 속성(공통 이름, 조직, SAN 등)의 신뢰할 수 있는 소스로 사용한다. 둘 다 동기화 상태를 유지하는 것을 강력히 권장한다.
+`certs renew` 는 기존 인증서를 kubeadm-config 컨피그맵(ConfigMap) 대신 속성(공통 이름, 조직, SAN 등)의 신뢰할 수 있는 소스로 사용한다. 둘 다 동기화 상태를 유지하는 것을 강력히 권장한다.
 {{< /note >}}
 
-`kubeadm alpha certs renew` 는 다음의 옵션을 제공한다.
+`kubeadm certs renew` 는 다음의 옵션을 제공한다.
 
 쿠버네티스 인증서는 일반적으로 1년 후 만료일에 도달한다.
 
@@ -153,37 +149,33 @@ HA 클러스터를 실행 중인 경우, 모든 컨트롤 플레인 노드에서
 ### 서명자 설정
 
 쿠버네티스 인증 기관(Certificate Authority)은 기본적으로 작동하지 않는다.
-[cert-manager][cert-manager-issuer] 와 같은 외부 서명자를 설정하거나, 빌트인 서명자를 사용할 수 있다.
+[cert-manager](https://docs.cert-manager.io/en/latest/tasks/issuers/setup-ca.html)와 같은 외부 서명자를 설정하거나, 빌트인 서명자를 사용할 수 있다.
 
-빌트인 서명자는 [`kube-controller-manager`][kcm] 의 일부이다.
+빌트인 서명자는 [`kube-controller-manager`](/docs/reference/command-line-tools-reference/kube-controller-manager/)의 일부이다.
 
 빌트인 서명자를 활성화하려면, `--cluster-signing-cert-file` 와 `--cluster-signing-key-file` 플래그를 전달해야 한다.
 
-새 클러스터를 생성하는 경우, kubeadm [구성 파일][config]을 사용할 수 있다.
+새 클러스터를 생성하는 경우, kubeadm [구성 파일](https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta2)을 사용할 수 있다.
 
-  ```yaml
-  apiVersion: kubeadm.k8s.io/v1beta2
-  kind: ClusterConfiguration
-  controllerManager:
-    extraArgs:
-      cluster-signing-cert-file: /etc/kubernetes/pki/ca.crt
-      cluster-signing-key-file: /etc/kubernetes/pki/ca.key
-  ```
-
-[cert-manager-issuer]: https://docs.cert-manager.io/en/latest/tasks/issuers/setup-ca.html
-[kcm]: /docs/reference/command-line-tools-reference/kube-controller-manager/
-[config]: https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta2
+```yaml
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+controllerManager:
+  extraArgs:
+    cluster-signing-cert-file: /etc/kubernetes/pki/ca.crt
+    cluster-signing-key-file: /etc/kubernetes/pki/ca.key
+```
 
 ### 인증서 서명 요청(CSR) 생성
 
-`kubeadm alpha certs renew --use-api` 로 쿠버네티스 인증서 API에 대한 인증서 서명 요청을 만들 수 있다.
+`kubeadm certs renew --use-api` 로 쿠버네티스 인증서 API에 대한 인증서 서명 요청을 만들 수 있다.
 
-[cert-manager][cert-manager] 와 같은 외부 서명자를 설정하면, 인증서 서명 요청(CSR)이 자동으로 승인된다.
-그렇지 않으면, [`kubectl certificate`][certs] 명령을 사용하여 인증서를 수동으로 승인해야 한다.
+[cert-manager](https://github.com/jetstack/cert-manager)와 같은 외부 서명자를 설정하면, 인증서 서명 요청(CSR)이 자동으로 승인된다.
+그렇지 않으면, [`kubectl certificate`](/ko/docs/setup/best-practices/certificates/) 명령을 사용하여 인증서를 수동으로 승인해야 한다.
 다음의 kubeadm 명령은 승인할 인증서 이름을 출력한 다음, 승인이 발생하기를 차단하고 기다린다.
 
 ```shell
-sudo kubeadm alpha certs renew apiserver --use-api &
+sudo kubeadm certs renew apiserver --use-api &
 ```
 출력 결과는 다음과 비슷하다.
 ```
@@ -195,7 +187,7 @@ sudo kubeadm alpha certs renew apiserver --use-api &
 
 외부 서명자를 설정하면, 인증서 서명 요청(CSR)이 자동으로 승인된다.
 
-그렇지 않으면, [`kubectl certificate`][certs] 명령을 사용하여 인증서를 수동으로 승인해야 한다. 예를 들어 다음과 같다.
+그렇지 않으면, [`kubectl certificate`](/ko/docs/setup/best-practices/certificates/) 명령을 사용하여 인증서를 수동으로 승인해야 한다. 예를 들어 다음과 같다.
 
 ```shell
 kubectl certificate approve kubeadm-cert-kube-apiserver-ld526
@@ -217,28 +209,26 @@ kubeadm 관점에서, 일반적으로 온-디스크(on-disk) CA에 의해 서명
 
 ### 인증서 서명 요청(CSR) 생성
 
-`kubeadm alpha certs renew --csr-only` 로 인증서 서명 요청을 만들 수 있다.
+`kubeadm certs renew --csr-only` 로 인증서 서명 요청을 만들 수 있다.
 
 CSR과 함께 제공되는 개인 키가 모두 출력된다.
 `--csr-dir` 로 사용할 디텍터리를 전달하여 지정된 위치로 CSR을 출력할 수 있다.
 `--csr-dir` 을 지정하지 않으면, 기본 인증서 디렉터리(`/etc/kubernetes/pki`)가 사용된다.
 
-`kubeadm alpha certs renew --csr-only` 로 인증서를 갱신할 수 있다.
+`kubeadm certs renew --csr-only` 로 인증서를 갱신할 수 있다.
 `kubeadm init` 과 마찬가지로 출력 디렉터리를 `--csr-dir` 플래그로 지정할 수 있다.
 
 CSR에는 인증서 이름, 도메인 및 IP가 포함되지만, 용도를 지정하지는 않는다.
-인증서를 발행할 때 [올바른 인증서 용도][cert-table]를 지정하는 것은 CA의 책임이다.
+인증서를 발행할 때 [올바른 인증서 용도](/ko/docs/setup/best-practices/certificates/#모든-인증서)를 지정하는 것은 CA의 책임이다.
 
-* `openssl` 의 경우 [`openssl ca` command][openssl-ca] 명령으로 수행한다.
-* `cfssl` 의 경우 [설정 파일에 용도][cfssl-usages]를 지정한다.
+* `openssl` 의 경우
+  [`openssl ca` 명령](https://superuser.com/questions/738612/openssl-ca-keyusage-extension)으로 수행한다.
+* `cfssl` 의 경우 [설정 파일에 용도](https://github.com/cloudflare/cfssl/blob/master/doc/cmd/cfssl.txt#L170)를 지정한다.
 
 선호하는 방법으로 인증서에 서명한 후, 인증서와 개인 키를 PKI 디렉터리(기본적으로 `/etc/kubernetes/pki`)에 복사해야 한다.
 
-[cert-manager]: https://github.com/jetstack/cert-manager
-[openssl-ca]: https://superuser.com/questions/738612/openssl-ca-keyusage-extension
-[cfssl-usages]: https://github.com/cloudflare/cfssl/blob/master/doc/cmd/cfssl.txt#L170
-[certs]: /ko/docs/setup/best-practices/certificates/
-[cert-cas]: /ko/docs/setup/best-practices/certificates/#단일-루트-ca
-[cert-table]: /ko/docs/setup/best-practices/certificates/#모든-인증서
+## 인증 기관(CA) 순환(rotation) {#certificate-authority-rotation}
 
+Kubeadm은 CA 인증서의 순환이나 교체 기능을 기본적으로 지원하지 않는다.
 
+CA의 수동 순환이나 교체에 대한 보다 상세한 정보는 [CA 인증서 수동 순환](/docs/tasks/tls/manual-rotation-of-ca-certificates/) 문서를 참조한다.

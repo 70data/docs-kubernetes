@@ -30,8 +30,8 @@ a Pod or Container. Security context settings include, but are not limited to:
 
 * readOnlyRootFilesystem: Mounts the container's root filesystem as read-only.
 
-The above bullets are not a complete set of security context settings -- please see 
-[SecurityContext](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#securitycontext-v1-core) 
+The above bullets are not a complete set of security context settings -- please see
+[SecurityContext](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#securitycontext-v1-core)
 for a comprehensive list.
 
 For more information about security mechanisms in Linux, see
@@ -59,11 +59,11 @@ Here is a configuration file for a Pod that has a `securityContext` and an `empt
 {{< codenew file="pods/security/security-context.yaml" >}}
 
 In the configuration file, the `runAsUser` field specifies that for any Containers in
-the Pod, all processes run with user ID 1000. The `runAsGroup` field specifies the primary group ID of 3000 for 
+the Pod, all processes run with user ID 1000. The `runAsGroup` field specifies the primary group ID of 3000 for
 all processes within any containers of the Pod. If this field is omitted, the primary group ID of the containers
-will be root(0). Any files created will also be owned by user 1000 and group 3000 when `runAsGroup` is specified. 
-Since `fsGroup` field is specified, all processes of the container are also part of the supplementary group ID 2000. 
-The owner for volume `/data/demo` and any files created in that volume will be Group ID 2000. 
+will be root(0). Any files created will also be owned by user 1000 and group 3000 when `runAsGroup` is specified.
+Since `fsGroup` field is specified, all processes of the container are also part of the supplementary group ID 2000.
+The owner for volume `/data/demo` and any files created in that volume will be Group ID 2000.
 
 Create the Pod:
 
@@ -138,7 +138,7 @@ $ id
 uid=1000 gid=3000 groups=2000
 ```
 You will see that gid is 3000 which is same as `runAsGroup` field. If the `runAsGroup` was omitted the gid would
-remain as 0(root) and the process will be able to interact with files that are owned by root(0) group and that have 
+remain as 0(root) and the process will be able to interact with files that are owned by root(0) group and that have
 the required group permissions for root(0) group.
 
 Exit your shell:
@@ -149,7 +149,7 @@ exit
 
 ## Configure volume permission and ownership change policy for Pods
 
-{{< feature-state for_k8s_version="v1.18" state="alpha" >}}
+{{< feature-state for_k8s_version="v1.20" state="beta" >}}
 
 By default, Kubernetes recursively changes ownership and permissions for the contents of each
 volume to match the `fsGroup` specified in a Pod's `securityContext` when that volume is
@@ -180,9 +180,9 @@ This is an alpha feature. To use it, enable the [feature gate](/docs/reference/c
 
 {{< note >}}
 This field has no effect on ephemeral volume types such as
-[`secret`](https://kubernetes.io/docs/concepts/storage/volumes/#secret),
-[`configMap`](https://kubernetes.io/docs/concepts/storage/volumes/#configmap),
-and [`emptydir`](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir).
+[`secret`](/docs/concepts/storage/volumes/#secret),
+[`configMap`](/docs/concepts/storage/volumes/#configmap),
+and [`emptydir`](/docs/concepts/storage/volumes/#emptydir).
 {{< /note >}}
 
 
@@ -243,7 +243,7 @@ exit
 
 ## Set capabilities for a Container
 
-With [Linux capabilities](http://man7.org/linux/man-pages/man7/capabilities.7.html),
+With [Linux capabilities](https://man7.org/linux/man-pages/man7/capabilities.7.html),
 you can grant certain privileges to a process without granting all the privileges
 of the root user. To add or remove Linux capabilities for a Container, include the
 `capabilities` field in the `securityContext` section of the Container manifest.
@@ -359,6 +359,40 @@ for definitions of the capability constants.
 Linux capability constants have the form `CAP_XXX`. But when you list capabilities in your Container manifest, you must omit the `CAP_` portion of the constant. For example, to add `CAP_SYS_TIME`, include `SYS_TIME` in your list of capabilities.
 {{< /note >}}
 
+## Set the Seccomp Profile for a Container
+
+To set the Seccomp profile for a Container, include the `seccompProfile` field
+in the `securityContext` section of your Pod or Container manifest. The
+`seccompProfile` field is a
+[SeccompProfile](/docs/reference/generated/kubernetes-api/{{< param "version"
+>}}/#seccompprofile-v1-core) object consisting of `type` and `localhostProfile`.
+Valid options for `type` include `RuntimeDefault`, `Unconfined`, and
+`Localhost`. `localhostProfile` must only be set set if `type: Localhost`. It
+indicates the path of the pre-configured profile on the node, relative to the
+kubelet's configured Seccomp profile location (configured with the `--root-dir`
+flag).
+
+Here is an example that sets the Seccomp profile to the node's container runtime
+default profile:
+
+```yaml
+...
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+```
+
+Here is an example that sets the Seccomp profile to a pre-configured file at
+`<kubelet-root-dir>/seccomp/my-profiles/profile-allow.json`:
+
+```yaml
+...
+securityContext:
+  seccompProfile:
+    type: Localhost
+    localhostProfile: my-profiles/profile-allow.json
+```
+
 ## Assign SELinux labels to a Container
 
 To assign SELinux labels to a Container, include the `seLinuxOptions` field in
@@ -423,6 +457,3 @@ kubectl delete pod security-context-demo-4
 * [Pod Security Policies](/docs/concepts/policy/pod-security-policy/)
 * [AllowPrivilegeEscalation design
   document](https://git.k8s.io/community/contributors/design-proposals/auth/no-new-privs.md)
-
-
-

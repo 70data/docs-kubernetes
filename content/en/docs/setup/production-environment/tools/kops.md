@@ -27,7 +27,7 @@ kops is an automated provisioning system:
 
 * You must [install](https://github.com/kubernetes/kops#installing) `kops` on a 64-bit (AMD64 and Intel 64) device architecture.
 
-* You must have an [AWS account](https://docs.aws.amazon.com/polly/latest/dg/setting-up.html), generate [IAM keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) and [configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration) them.
+* You must have an [AWS account](https://docs.aws.amazon.com/polly/latest/dg/setting-up.html), generate [IAM keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) and [configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration) them. The IAM user will need [adequate permissions](https://github.com/kubernetes/kops/blob/master/docs/getting_started/aws.md#setup-iam-user).
 
 
 
@@ -39,7 +39,7 @@ kops is an automated provisioning system:
 
 #### Installation
 
-Download kops from the [releases page](https://github.com/kubernetes/kops/releases) (it is also easy to build from source):
+Download kops from the [releases page](https://github.com/kubernetes/kops/releases) (it is also convenient to build from source):
 
 {{< tabs name="kops_installation" >}}
 {{% tab name="macOS" %}}
@@ -140,14 +140,14 @@ you choose for organization reasons (e.g. you are allowed to create records unde
 but not under `example.com`).
 
 Let's assume you're using `dev.example.com` as your hosted zone.  You create that hosted zone using
-the [normal process](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingNewSubdomain.html), or
+the [normal process](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingNewSubdomain.html), or
 with a command such as `aws route53 create-hosted-zone --name dev.example.com --caller-reference 1`.
 
 You must then set up your NS records in the parent domain, so that records in the domain will resolve.  Here,
 you would create NS records in `example.com` for `dev`.  If it is a root domain name you would configure the NS
 records at your domain registrar (e.g. `example.com` would need to be configured where you bought `example.com`).
 
-This step is easy to mess up (it is the #1 cause of problems!)  You can double-check that
+Verify your route53 domain setup (it is the #1 cause of problems!). You can double-check that
 your cluster is configured correctly if you have the dig tool by running:
 
 `dig NS dev.example.com`
@@ -231,9 +231,8 @@ See the [list of add-ons](/docs/concepts/cluster-administration/addons/) to expl
 ## {{% heading "whatsnext" %}}
 
 
-* Learn more about Kubernetes [concepts](/docs/concepts/) and [`kubectl`](/docs/user-guide/kubectl-overview/).
+* Learn more about Kubernetes [concepts](/docs/concepts/) and [`kubectl`](/docs/reference/kubectl/overview/).
 * Learn more about `kops` [advanced usage](https://kops.sigs.k8s.io/) for tutorials, best practices and advanced configuration options.
 * Follow `kops` community discussions on Slack: [community discussions](https://github.com/kubernetes/kops#other-ways-to-communicate-with-the-contributors)
 * Contribute to `kops` by addressing or raising an issue [GitHub Issues](https://github.com/kubernetes/kops/issues)
-
 

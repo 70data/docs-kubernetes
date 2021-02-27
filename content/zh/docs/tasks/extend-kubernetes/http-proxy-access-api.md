@@ -3,7 +3,6 @@ title: 使用 HTTP 代理访问 Kubernetes API
 content_type: task
 weight: 40
 ---
-
 <!--
 ---
 title: Use an HTTP Proxy to Access the Kubernetes API
@@ -31,7 +30,7 @@ This page shows how to use an HTTP proxy to access the Kubernetes API.
 * 如果您的集群中还没有任何应用，使用如下命令启动一个 Hello World 应用：
 
 ```shell
-kubectl run node-hello --image=gcr.io/google-samples/node-hello:1.0 --port=8080
+kubectl create deployment node-hello --image=gcr.io/google-samples/node-hello:1.0 --port=8080
 ```
 
 
@@ -67,6 +66,12 @@ Get the API versions:
 获取 API 版本：
 
     curl http://localhost:8080/api/
+
+<!--
+The output should look similar to this:
+-->
+
+输出应该类似这样：
 
     {
       "kind": "APIVersions",

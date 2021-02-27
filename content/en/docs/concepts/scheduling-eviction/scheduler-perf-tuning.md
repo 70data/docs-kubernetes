@@ -3,7 +3,7 @@ reviewers:
 - bsalamat
 title: Scheduler Performance Tuning
 content_type: concept
-weight: 70
+weight: 80
 ---
 
 <!-- overview -->
@@ -48,16 +48,12 @@ To change the value, edit the kube-scheduler configuration file (this is likely
 to be `/etc/kubernetes/config/kube-scheduler.yaml`), then restart the scheduler.
 
 After you have made this change, you can run
+
 ```bash
-kubectl get componentstatuses
+kubectl get pods -n kube-system | grep kube-scheduler
 ```
-to verify that the kube-scheduler component is healthy. The output is similar to:
-```
-NAME                 STATUS    MESSAGE             ERROR
-controller-manager   Healthy   ok
-scheduler            Healthy   ok
-...
-```
+
+to verify that the kube-scheduler component is healthy.
 
 ## Node scoring threshold {#percentage-of-nodes-to-score}
 
@@ -111,7 +107,7 @@ value being calculated based on the cluster size. There is also a hardcoded
 minimum value of 50 nodes.
 
 {{< note >}}In clusters with less than 50 feasible nodes, the scheduler still
-checks all the nodes, simply because there are not enough feasible nodes to stop
+checks all the nodes because there are not enough feasible nodes to stop
 the scheduler's search early.
 
 In a small cluster, if you set a low value for `percentageOfNodesToScore`, your

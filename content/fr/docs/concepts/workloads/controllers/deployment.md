@@ -116,7 +116,7 @@ Avant de commencer, assurez-vous que votre cluster Kubernetes est opérationnel.
 
    ```shell
    Waiting for rollout to finish: 2 out of 3 new replicas have been updated...
-   deployment.apps/nginx-deployment successfully rolled out
+   deployment "nginx-deployment" successfully rolled out
    ```
 
 1. Exécutez à nouveau `kubectl get deployments` quelques secondes plus tard.
@@ -223,7 +223,7 @@ Suivez les étapes ci-dessous pour mettre à jour votre déploiement:
     ou
 
     ```text
-    deployment.apps/nginx-deployment successfully rolled out
+    deployment "nginx-deployment" successfully rolled out
     ```
 
 Obtenez plus de détails sur votre déploiement mis à jour:
@@ -285,7 +285,7 @@ Obtenez plus de détails sur votre déploiement mis à jour:
 
     La sortie est similaire à ceci:
 
-      ```text
+    ```text
     Name:                   nginx-deployment
     Namespace:              default
     CreationTimestamp:      Thu, 30 Nov 2017 10:56:25 +0000
@@ -932,7 +932,7 @@ La sortie est similaire à ceci:
 
 ```text
 Waiting for rollout to finish: 2 of 3 updated replicas are available...
-deployment.apps/nginx-deployment successfully rolled out
+deployment "nginx-deployment" successfully rolled out
 $ echo $?
 0
 ```

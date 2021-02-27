@@ -1,18 +1,19 @@
 ---
+
+
 title: HugePages 관리
-content_template: templates/task
+content_type: task
+description: 클러스터에서 huge page를 스케줄할 수 있는 리소스로 구성하고 관리한다.
 ---
 
-{{% capture overview %}}
+<!-- overview -->
 {{< feature-state state="stable" >}}
 
-쿠버네티스는 **GA** 기능으로 파드의 애플리케이션에 미리 할당된
-huge page의 할당과 사용을 지원한다. 이 페이지에서는 사용자가
-huge page를 사용하는 방법과 현재의 제약 사항에 대해 설명한다.
+쿠버네티스는 파드의 애플리케이션에 미리 할당된
+huge page의 할당과 사용을 지원한다. 이 페이지에서는 사용자가 huge page를 사용하는 방법에 대해 설명한다.
 
-{{% /capture %}}
+## {{% heading "prerequisites" %}}
 
-{{% capture prerequisites %}}
 
 1. 쿠버네티스 노드는 노드에 대한 huge page 용량을 보고하기 위해
    huge page를 미리 할당해야 한다. 노드는 여러 크기의 huge page를 미리 할당할 수
@@ -21,9 +22,9 @@ huge page를 사용하는 방법과 현재의 제약 사항에 대해 설명한�
 노드는 모든 huge page 리소스를 스케줄 가능한 리소스로 자동 검색하고
 보고한다.
 
-{{% /capture %}}
 
-{{% capture steps %}}
+
+<!-- steps -->
 
 ## API
 
@@ -103,24 +104,18 @@ spec:
 
 - Huge page 요청(requests)은 제한(limits)과 같아야 한다. 제한이 지정되었지만, 요청은 지정되지 않은 경우
   이것이 기본값이다.
-- Huge page는 컨테이너 범위에서 격리되므로, 각 컨테이너에는 컨테이너 사양에서 요청한대로 cgroup 샌드박스에 대한 제한이 있다.
+- Huge page는 컨테이너 범위에서 격리되므로, 각 컨테이너에는 컨테이너 사양에서 요청한대로
+  cgroup 샌드박스에 대한 제한이 있다.
 - Huge page가 지원하는 EmptyDir 볼륨은 파드 요청보다 더 많은 huge page 메모리를
   사용하지 말아야 한다.
 - `shmget()` 의 `SHM_HUGETLB` 를 통해 huge page를 사용하는 애플리케이션은
   `proc/sys/vm/hugetlb_shm_group` 과 일치하는 보충 그룹(supplemental group)으로 실행해야 한다.
 - 네임스페이스에서의 huge page 사용은 `hugepages-<size>` 토큰을 사용하는 `cpu` 또는 `memory` 와 같은
-다른 컴퓨트 리소스와 비슷한 리소스쿼터(ResourceQuota)를 통해 제어할 수
-있다.
-- 다양한 크기의 huge page 지원이 기능 게이트로 제공된다. {{<
-glossary_tooltip text="kubelet" term_id="kubelet" >}} 및 {{<
-glossary_tooltip text="kube-apiserver"
-term_id="kube-apiserver" >}} (`--feature-gates=HugePageStorageMediumSize=true`)의
-`HugePageStorageMediumSize` [기능
-게이트](/docs/reference/command-line-tools-reference/feature-gates/)를 사용하여 활성화할 수 있다.
-
-## 향후 버전
-
-- NUMA 지역성(locality)은 서비스 품질(QoS)의 기능으로 보장할 예정이다.
-- 리밋레인지(LimitRange)를 지원할 예정이다.
-
-{{% /capture %}}
+  다른 컴퓨트 리소스와 비슷한 리소스쿼터(ResourceQuota)를 통해 제어할 수
+  있다.
+- 다양한 크기의 huge page 지원이 기능 게이트로 제공된다.
+  {{<glossary_tooltip text="kubelet" term_id="kubelet" >}} 및
+  {{<glossary_tooltip text="kube-apiserver" term_id="kube-apiserver" >}}
+  (`--feature-gates=HugePageStorageMediumSize=true`)의 `HugePageStorageMediumSize`
+  [기능 게이트](/ko/docs/reference/command-line-tools-reference/feature-gates/)를
+  사용하여 비활성화할 수 있다.

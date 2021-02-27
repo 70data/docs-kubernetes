@@ -20,8 +20,12 @@ This section contains information you should know before contributing new conten
 - Write Kubernetes documentation in Markdown and build the Kubernetes site using [Hugo](https://gohugo.io/).
 - The source is in [GitHub](https://github.com/kubernetes/website). You can find Kubernetes documentation at `/content/en/docs/`. Some of the reference documentation is automatically generated from scripts in the `update-imported-docs/` directory.
 - [Page content types](/docs/contribute/style/page-content-types/) describe the presentation of documentation content in Hugo.
-- In addition to the standard Hugo shortcodes, we use a number of [custom Hugo shortcodes](/docs/contribute/style/hugo-shortcodes/) in our documentation to control the presentation of content.
-- Documentation source is available in multiple languages in `/content/`. Each language has its own folder with a two-letter code determined by the [ISO 639-1 standard](https://www.loc.gov/standards/iso639-2/php/code_list.php). For example, English documentation source is stored in `/content/en/docs/`.
+- In addition to the standard Hugo shortcodes, we use a number of
+  [custom Hugo shortcodes](/docs/contribute/style/hugo-shortcodes/) in our documentation to control the presentation of content.
+- Documentation source is available in multiple languages in `/content/`. Each
+  language has its own folder with a two-letter code determined by the
+  [ISO 639-1 standard](https://www.loc.gov/standards/iso639-2/php/code_list.php). For
+  example, English documentation source is stored in `/content/en/docs/`.
 - For more information about contributing to documentation in multiple languages or starting a new translation, see [localization](/docs/contribute/localization).
 
 ## Before you begin {#before-you-begin}
@@ -39,7 +43,7 @@ When opening a pull request, you need to know in advance which branch to base yo
 Scenario | Branch
 :---------|:------------
 Existing or new English language content for the current release | `master`
-Content for a feature change release | The branch which corresponds to the major and minor version the feature change is in, using the pattern `dev-release-<version>`. For example, if a feature changes in the `{{< latest-version >}}` release, then add documentation changes to the ``dev-{{< release-branch >}}`` branch.
+Content for a feature change release | The branch which corresponds to the major and minor version the feature change is in, using the pattern `dev-<version>`. For example, if a feature changes in the `v{{< skew nextMinorVersion >}}` release, then add documentation changes to the ``dev-{{< skew nextMinorVersion >}}`` branch.
 Content in other languages (localizations) | Use the localization's convention. See the [Localization branching strategy](/docs/contribute/localization/#branching-strategy) for more information.
 
 

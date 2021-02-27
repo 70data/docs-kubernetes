@@ -75,7 +75,8 @@ spec:
       requests:
         cpu: 700m
         memory: 200Mi
-...
+  ...
+status:
   qosClass: Guaranteed
 ```
 
@@ -125,7 +126,8 @@ spec:
         memory: 200Mi
       requests:
         memory: 100Mi
-...
+  ...
+status:
   qosClass: Burstable
 ```
 
@@ -163,6 +165,7 @@ spec:
     ...
     resources: {}
   ...
+status:
   qosClass: BestEffort
 ```
 
@@ -206,6 +209,7 @@ spec:
     name: qos-demo-4-ctr-2
     resources: {}
     ...
+status:
   qosClass: Burstable
 ```
 
@@ -237,17 +241,17 @@ kubectl delete namespace qos-example
 
 ### クラスター管理者向け
 
-* [Namespaceにメモリー要求および制限のデフォルト値を設定する](/docs/tasks/administer-cluster/memory-default-namespace/)
+* [Namespaceにメモリー要求および制限のデフォルト値を設定する](/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/)
 
-* [NamespaceにCPU要求および制限のデフォルト値を設定する](/docs/tasks/administer-cluster/cpu-default-namespace/)
+* [NamespaceにCPU要求および制限のデフォルト値を設定する](/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/)
 
-* [Namespaceに最小および最大メモリー量の制約を設定する](/docs/tasks/administer-cluster/memory-constraint-namespace/)
+* [Namespaceに最小および最大メモリー量の制約を設定する](/docs/tasks/administer-cluster/manage-resources/memory-constraint-namespace/)
 
-* [Namespaceに最小および最大のCPU使用量の制約を設定する](/docs/tasks/administer-cluster/cpu-constraint-namespace/)
+* [Namespaceに最小および最大のCPU使用量の制約を設定する](/docs/tasks/administer-cluster/manage-resources/cpu-constraint-namespace/)
 
-* [NamespaceにメモリーおよびCPUのクォータを設定する](/docs/tasks/administer-cluster/quota-memory-cpu-namespace/)
+* [NamespaceにメモリーおよびCPUのクォータを設定する](/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/)
 
-* [NamespaceにPodのクォータを設定する](/docs/tasks/administer-cluster/quota-pod-namespace/)
+* [NamespaceにPodのクォータを設定する](/docs/tasks/administer-cluster/manage-resources/quota-pod-namespace/)
 
 * [APIオブジェクトのクォータを設定する](/docs/tasks/administer-cluster/quota-api-object/)
 

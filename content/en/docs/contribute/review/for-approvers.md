@@ -8,7 +8,9 @@ weight: 20
 
 <!-- overview -->
 
-SIG Docs [Reviewers](/docs/contribute/participating/#reviewers) and [Approvers](/docs/contribute/participating/#approvers) do a few extra things when reviewing a change.
+SIG Docs [Reviewers](/docs/contribute/participate/#reviewers) and
+[Approvers](/docs/contribute/participate/#approvers) do a few extra things
+when reviewing a change.
 
 Every week a specific docs approver volunteers to triage
 and review pull requests. This
@@ -18,9 +20,6 @@ requests (PRs) that are not already under active review.
 
 In addition to the rotation, a bot assigns reviewers and approvers
 for the PR based on the owners for the affected files.
-
-
-
 
 <!-- body -->
 
@@ -191,7 +190,7 @@ close the issue without fixing.
 
 Some docs issues are actually issues with the underlying code, or requests for
 assistance when something, for example a tutorial, doesn't work.
-For issues unrelated to docs, close the issue with the `triage/support` label and a comment
+For issues unrelated to docs, close the issue with the `kind/support` label and a comment
 directing the requester to support venues (Slack, Stack Overflow) and, if
 relevant, the repository to file an issue for bugs with features (`kubernetes/kubernetes`
 is a great place to start).
@@ -202,9 +201,9 @@ Sample response to a request for support:
 This issue sounds more like a request for support and less
 like an issue specifically for docs. I encourage you to bring
 your question to the `#kubernetes-users` channel in
-[Kubernetes slack](http://slack.k8s.io/). You can also search
+[Kubernetes slack](https://slack.k8s.io/). You can also search
 resources like
-[Stack Overflow](http://stackoverflow.com/questions/tagged/kubernetes)
+[Stack Overflow](https://stackoverflow.com/questions/tagged/kubernetes)
 for answers to similar questions.
 
 You can also open issues for Kubernetes functionality in

@@ -32,7 +32,7 @@ First, consult the [ISO 639-1 standard](https://www.loc.gov/standards/iso639-2/p
 
 ### Fork and clone the repo
 
-First, [create your own fork](/docs/contribute/new-content/new-content/#fork-the-repo) of the [kubernetes/website](https://github.com/kubernetes/website) repository.
+First, [create your own fork](/docs/contribute/new-content/open-a-pr/#fork-the-repo) of the [kubernetes/website](https://github.com/kubernetes/website) repository.
 
 Then, clone your fork and `cd` into it:
 
@@ -73,9 +73,11 @@ For an example of adding a label, see the PR for adding the [Italian language la
 
 ### Find community
 
-Let Kubernetes SIG Docs know you're interested in creating a localization! Join the [SIG Docs Slack channel](https://kubernetes.slack.com/messages/C1J0BPD2M/). Other localization teams are happy to help you get started and answer any questions you have.
+Let Kubernetes SIG Docs know you're interested in creating a localization! Join the [SIG Docs Slack channel](https://kubernetes.slack.com/messages/sig-docs) and the [SIG Docs Localizations Slack channel](https://kubernetes.slack.com/messages/sig-docs-localizations). Other localization teams are happy to help you get started and answer any questions you have.
 
-You can also create a Slack channel for your localization in the `kubernetes/community` repository. For an example of adding a Slack channel, see the PR for [adding channels for Indonesian and Portuguese](https://github.com/kubernetes/community/pull/3605).
+Please also consider participating in the [SIG Docs Localization Subgroup meeting](https://github.com/kubernetes/community/tree/master/sig-docs).  The mission of the SIG Docs localization subgroup is to work across the SIG Docs localization teams to collaborate on defining and documenting the processes for creating localized contribution guides. In addition, the SIG Docs localization subgroup will look for opportunities for the creation and sharing of common tools across localization teams and also serve to identify new requirements to the SIG Docs Leadership team.  If you have questions about this meeting, please inquire on the [SIG Docs Localizations Slack channel](https://kubernetes.slack.com/messages/sig-docs-localizations).
+
+You can also create a Slack channel for your localization in the `kubernetes/community` repository. For an example of adding a Slack channel, see the PR for [adding a channel for Persian](https://github.com/kubernetes/community/pull/4980).
 
 ## Minimum required content
 
@@ -183,7 +185,7 @@ Description | URLs
 -----|-----
 Home | [All heading and subheading URLs](/docs/home/)
 Setup | [All heading and subheading URLs](/docs/setup/)
-Tutorials | [Kubernetes Basics](/docs/tutorials/kubernetes-basics/), [Hello Minikube](/docs/tutorials/stateless-application/hello-minikube/)
+Tutorials | [Kubernetes Basics](/docs/tutorials/kubernetes-basics/), [Hello Minikube](/docs/tutorials/hello-minikube/)
 Site strings | [All site strings in a new localized TOML file](https://github.com/kubernetes/website/tree/master/i18n)
 
 Translated documents must reside in their own `content/**/` subdirectory, but otherwise follow the same URL path as the English source. For example, to prepare the [Kubernetes Basics](/docs/tutorials/kubernetes-basics/) tutorial for translation into German, create a subfolder under the `content/de/` folder and copy the English source:
@@ -265,7 +267,7 @@ Teams must merge localized content into the same release branch from which the c
 
 An approver must maintain a development branch by keeping it current with its source branch and resolving merge conflicts. The longer a development branch stays open, the more maintenance it typically requires. Consider periodically merging development branches and opening new ones, rather than maintaining one extremely long-running development branch.
 
-At the beginning of every team milestone, it's helpful to open an issue [comparing upstream changes](https://github.com/kubernetes/website/blob/master/scripts/upstream_changes.py) between the previous development branch and the current development branch.
+At the beginning of every team milestone, it's helpful to open an issue comparing upstream changes between the previous development branch and the current development branch. There are two scripts for comparing upstream changes. [`upstream_changes.py`](https://github.com/kubernetes/website/tree/master/scripts#upstream_changespy) is useful for checking the changes made to a specific file. And [`diff_l10n_branches.py`](https://github.com/kubernetes/website/tree/master/scripts#diff_l10n_branchespy) is useful for creating a list of outdated files for a specific localization branch.
 
  While only approvers can open a new development branch and merge pull requests, anyone can open a pull request for a new development branch. No special permissions are required.
 

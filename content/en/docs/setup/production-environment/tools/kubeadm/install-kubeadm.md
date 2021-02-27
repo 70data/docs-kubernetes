@@ -21,14 +21,14 @@ For information how to create a cluster with kubeadm once you have performed thi
 * One or more machines running one of:
   - Ubuntu 16.04+
   - Debian 9+
-  - CentOS 7
-  - Red Hat Enterprise Linux (RHEL) 7
+  - CentOS 7+
+  - Red Hat Enterprise Linux (RHEL) 7+
   - Fedora 25+
   - HypriotOS v1.0.1+
-  - Container Linux (tested with 1800.6.0)
-* 2 GB or more of RAM per machine (any less will leave little room for your apps)
-* 2 CPUs or more
-* Full network connectivity between all machines in the cluster (public or private network is fine)
+  - Flatcar Container Linux (tested with 2512.3.0)
+* 2 GB or more of RAM per machine (any less will leave little room for your apps).
+* 2 CPUs or more.
+* Full network connectivity between all machines in the cluster (public or private network is fine).
 * Unique hostname, MAC address, and product_uuid for every node. See [here](#verify-mac-address) for more details.
 * Certain ports are open on your machines. See [here](#check-required-ports) for more details.
 * Swap disabled. You **MUST** disable swap in order for the kubelet to work properly.
@@ -54,9 +54,15 @@ route, we recommend you add IP route(s) so Kubernetes cluster addresses go via t
 
 ## Letting iptables see bridged traffic
 
+Make sure that the `br_netfilter` module is loaded. This can be done by running `lsmod | grep br_netfilter`. To load it explicitly call `sudo modprobe br_netfilter`.
+
 As a requirement for your Linux Node's iptables to correctly see bridged traffic, you should ensure `net.bridge.bridge-nf-call-iptables` is set to 1 in your `sysctl` config, e.g.
 
 ```bash
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -64,9 +70,7 @@ EOF
 sudo sysctl --system
 ```
 
-Make sure that the `br_netfilter` module is loaded before this step. This can be done by running `lsmod | grep br_netfilter`. To load it explicitly call `sudo modprobe br_netfilter`.
-
-For more details please see the [Network Plugin Requirements](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/#network-plugin-requirements) page.
+For more details please see the [Network Plugin Requirements](/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/#network-plugin-requirements) page.
 
 ## Check required ports
 
@@ -76,7 +80,7 @@ For more details please see the [Network Plugin Requirements](https://kubernetes
 |----------|-----------|------------|-------------------------|---------------------------|
 | TCP      | Inbound   | 6443*      | Kubernetes API server   | All                       |
 | TCP      | Inbound   | 2379-2380  | etcd server client API  | kube-apiserver, etcd      |
-| TCP      | Inbound   | 10250      | Kubelet API             | Self, Control plane       |
+| TCP      | Inbound   | 10250      | kubelet API             | Self, Control plane       |
 | TCP      | Inbound   | 10251      | kube-scheduler          | Self                      |
 | TCP      | Inbound   | 10252      | kube-controller-manager | Self                      |
 
@@ -84,7 +88,7 @@ For more details please see the [Network Plugin Requirements](https://kubernetes
 
 | Protocol | Direction | Port Range  | Purpose               | Used By                 |
 |----------|-----------|-------------|-----------------------|-------------------------|
-| TCP      | Inbound   | 10250       | Kubelet API           | Self, Control plane     |
+| TCP      | Inbound   | 10250       | kubelet API           | Self, Control plane     |
 | TCP      | Inbound   | 30000-32767 | NodePort Services†    | All                     |
 
 † Default port range for [NodePort Services](/docs/concepts/services-networking/service/).
@@ -160,7 +164,7 @@ need to ensure they match the version of the Kubernetes control plane you want
 kubeadm to install for you. If you do not, there is a risk of a version skew occurring that
 can lead to unexpected, buggy behaviour. However, _one_ minor version skew between the
 kubelet and the control plane is supported, but the kubelet version may never exceed the API
-server version. For example, kubelets running 1.7.0 should be fully compatible with a 1.8.0 API server,
+server version. For example, the kubelet running 1.7.0 should be fully compatible with a 1.8.0 API server,
 but not vice versa.
 
 For information about installing `kubectl`, see [Install and set up kubectl](/docs/tasks/tools/install-kubectl/).
@@ -191,7 +195,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 {{% /tab %}}
 {{% tab name="CentOS, RHEL or Fedora" %}}
 ```bash
-cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
@@ -203,12 +207,12 @@ exclude=kubelet kubeadm kubectl
 EOF
 
 # Set SELinux in permissive mode (effectively disabling it)
-setenforce 0
-sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
-systemctl enable --now kubelet
+sudo systemctl enable --now kubelet
 ```
 
   **Notes:**
@@ -218,39 +222,48 @@ systemctl enable --now kubelet
     You have to do this until SELinux support is improved in the kubelet.
 
   - You can leave SELinux enabled if you know how to configure it but it may require settings that are not supported by kubeadm.
-    
+
 {{% /tab %}}
-{{% tab name="Container Linux" %}}
+{{% tab name="Fedora CoreOS or Flatcar Container Linux" %}}
 Install CNI plugins (required for most pod network):
 
 ```bash
 CNI_VERSION="v0.8.2"
-mkdir -p /opt/cni/bin
-curl -L "https://github.com/containernetworking/plugins/releases/download/${CNI_VERSION}/cni-plugins-linux-amd64-${CNI_VERSION}.tgz" | tar -C /opt/cni/bin -xz
+sudo mkdir -p /opt/cni/bin
+curl -L "https://github.com/containernetworking/plugins/releases/download/${CNI_VERSION}/cni-plugins-linux-amd64-${CNI_VERSION}.tgz" | sudo tar -C /opt/cni/bin -xz
+```
+
+Define the directory to download command files  
+
+{{< note >}}
+The `DOWNLOAD_DIR` variable must be set to a writable directory.
+If you are running Flatcar Container Linux, set `DOWNLOAD_DIR=/opt/bin`.
+{{< /note >}}
+
+```bash
+DOWNLOAD_DIR=/usr/local/bin
+sudo mkdir -p $DOWNLOAD_DIR
 ```
 
 Install crictl (required for kubeadm / Kubelet Container Runtime Interface (CRI))
 
 ```bash
 CRICTL_VERSION="v1.17.0"
-mkdir -p /opt/bin
-curl -L "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" | tar -C /opt/bin -xz
+curl -L "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz" | sudo tar -C $DOWNLOAD_DIR -xz
 ```
 
 Install `kubeadm`, `kubelet`, `kubectl` and add a `kubelet` systemd service:
 
 ```bash
 RELEASE="$(curl -sSL https://dl.k8s.io/release/stable.txt)"
+cd $DOWNLOAD_DIR
+sudo curl -L --remote-name-all https://storage.googleapis.com/kubernetes-release/release/${RELEASE}/bin/linux/amd64/{kubeadm,kubelet,kubectl}
+sudo chmod +x {kubeadm,kubelet,kubectl}
 
-mkdir -p /opt/bin
-cd /opt/bin
-curl -L --remote-name-all https://storage.googleapis.com/kubernetes-release/release/${RELEASE}/bin/linux/amd64/{kubeadm,kubelet,kubectl}
-chmod +x {kubeadm,kubelet,kubectl}
-
-RELEASE_VERSION="v0.2.7"
-curl -sSL "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service" | sed "s:/usr/bin:/opt/bin:g" > /etc/systemd/system/kubelet.service
-mkdir -p /etc/systemd/system/kubelet.service.d
-curl -sSL "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf" | sed "s:/usr/bin:/opt/bin:g" > /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+RELEASE_VERSION="v0.4.0"
+curl -sSL "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service" | sed "s:/usr/bin:${DOWNLOAD_DIR}:g" | sudo tee /etc/systemd/system/kubelet.service
+sudo mkdir -p /etc/systemd/system/kubelet.service.d
+curl -sSL "https://raw.githubusercontent.com/kubernetes/release/${RELEASE_VERSION}/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf" | sed "s:/usr/bin:${DOWNLOAD_DIR}:g" | sudo tee /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 ```
 
 Enable and start `kubelet`:
@@ -258,6 +271,12 @@ Enable and start `kubelet`:
 ```bash
 systemctl enable --now kubelet
 ```
+
+{{< note >}}
+The Flatcar Container Linux distribution mounts the `/usr` directory as a read-only filesystem.
+Before bootstrapping your cluster, you need to take additional steps to configure a writable directory.
+See the [Kubeadm Troubleshooting guide](/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/#usr-mounted-read-only/) to learn how to set up a writable directory.
+{{< /note >}}
 {{% /tab %}}
 {{< /tabs >}}
 
@@ -270,7 +289,7 @@ kubeadm to tell it what to do.
 When using Docker, kubeadm will automatically detect the cgroup driver for the kubelet
 and set it in the `/var/lib/kubelet/config.yaml` file during runtime.
 
-If you are using a different CRI, you have to modify the file with your `cgroupDriver` value, like so:
+If you are using a different CRI, you must pass your `cgroupDriver` value to `kubeadm init`, like so:
 
 ```yaml
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -278,21 +297,16 @@ kind: KubeletConfiguration
 cgroupDriver: <value>
 ```
 
+For further details, please read [Using kubeadm init with a configuration file](/docs/reference/setup-tools/kubeadm/kubeadm-init/#config-file).
+
 Please mind, that you **only** have to do that if the cgroup driver of your CRI
 is not `cgroupfs`, because that is the default value in the kubelet already.
 
 {{< note >}}
-Since `--cgroup-driver` flag has been deprecated by kubelet, if you have that in `/var/lib/kubelet/kubeadm-flags.env`
+Since `--cgroup-driver` flag has been deprecated by the kubelet, if you have that in `/var/lib/kubelet/kubeadm-flags.env`
 or `/etc/default/kubelet`(`/etc/sysconfig/kubelet` for RPMs), please remove it and use the KubeletConfiguration instead
 (stored in `/var/lib/kubelet/config.yaml` by default).
 {{< /note >}}
-
-Restarting the kubelet is required:
-
-```bash
-systemctl daemon-reload
-systemctl restart kubelet
-```
 
 The automatic detection of cgroup driver for other container runtimes
 like CRI-O and containerd is work in progress.
@@ -306,4 +320,3 @@ If you are running into difficulties with kubeadm, please consult our [troublesh
 
 
 * [Using kubeadm to Create a Cluster](/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
-

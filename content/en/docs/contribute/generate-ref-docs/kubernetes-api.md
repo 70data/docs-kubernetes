@@ -182,7 +182,8 @@ Verify the [local preview](http://localhost:1313/docs/reference/generated/kubern
 
 ```shell
 cd <web-base>
-make docker-serve
+git submodule update --init --recursive --depth 1 # if not already done
+make container-serve
 ```
 
 ## Commit the changes
@@ -190,15 +191,13 @@ make docker-serve
 In `<web-base>` run `git add` and `git commit` to commit the change.
 
 Submit your changes as a
-[pull request](/docs/contribute/start/) to the
+[pull request](/docs/contribute/new-content/open-a-pr/) to the
 [kubernetes/website](https://github.com/kubernetes/website) repository.
 Monitor your pull request, and respond to reviewer comments as needed. Continue
 to monitor your pull request until it has been merged.
 
 
-
 ## {{% heading "whatsnext" %}}
-
 
 * [Generating Reference Documentation Quickstart](/docs/contribute/generate-ref-docs/quickstart/)
 * [Generating Reference Docs for Kubernetes Components and Tools](/docs/contribute/generate-ref-docs/kubernetes-components/)

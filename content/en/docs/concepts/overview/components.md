@@ -3,6 +3,9 @@ reviewers:
 - lavalamp
 title: Kubernetes Components
 content_type: concept
+description: >
+  A Kubernetes cluster consists of the components that represent the control plane
+  and a set of machines called nodes.
 weight: 20
 card: 
   name: concepts
@@ -18,7 +21,7 @@ a complete and working Kubernetes cluster.
 
 Here's the diagram of a Kubernetes cluster with all the components tied together.
 
-![Components of Kubernetes](/images/docs/components-of-kubernetes.png)
+![Components of Kubernetes](/images/docs/components-of-kubernetes.svg)
 
 
 

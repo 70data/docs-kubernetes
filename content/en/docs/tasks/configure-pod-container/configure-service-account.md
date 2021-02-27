@@ -23,15 +23,9 @@ authenticated by the apiserver as a particular User Account (currently this is
 usually `admin`, unless your cluster administrator has customized your cluster). Processes in containers inside pods can also contact the apiserver.
 When they do, they are authenticated as a particular Service Account (for example, `default`).
 
-
-
-
 ## {{% heading "prerequisites" %}}
 
-
 {{< include "task-tutorial-prereqs.md" >}} {{< version-check >}}
-
-
 
 <!-- steps -->
 
@@ -39,10 +33,14 @@ When they do, they are authenticated as a particular Service Account (for exampl
 
 When you create a pod, if you do not specify a service account, it is
 automatically assigned the `default` service account in the same namespace.
-If you get the raw json or yaml for a pod you have created (for example, `kubectl get pods/<podname> -o yaml`), you can see the `spec.serviceAccountName` field has been [automatically set](/docs/user-guide/working-with-resources/#resources-are-automatically-modified).
+If you get the raw json or yaml for a pod you have created (for example, `kubectl get pods/<podname> -o yaml`),
+you can see the `spec.serviceAccountName` field has been
+[automatically set](/docs/concepts/overview/working-with-objects/object-management/).
 
-You can access the API from inside a pod using automatically mounted service account credentials, as described in [Accessing the Cluster](/docs/user-guide/accessing-the-cluster/#accessing-the-api-from-a-pod).
-The API permissions of the service account depend on the [authorization plugin and policy](/docs/reference/access-authn-authz/authorization/#authorization-modules) in use.
+You can access the API from inside a pod using automatically mounted service account credentials, as described in
+[Accessing the Cluster](/docs/tasks/access-application-cluster/access-cluster).
+The API permissions of the service account depend on the
+[authorization plugin and policy](/docs/reference/access-authn-authz/authorization/#authorization-modules) in use.
 
 In version 1.6+, you can opt out of automounting API credentials for a service account by setting `automountServiceAccountToken: false` on the service account:
 
@@ -78,6 +76,7 @@ You can list this and any other serviceAccount resources in the namespace with t
 ```shell
 kubectl get serviceaccounts
 ```
+
 The output is similar to this:
 
 ```
@@ -104,9 +103,10 @@ If you get a complete dump of the service account object, like this:
 ```shell
 kubectl get serviceaccounts/build-robot -o yaml
 ```
+
 The output is similar to this:
 
-```
+```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -123,7 +123,7 @@ then you will see that a token has automatically been created and is referenced 
 
 You may use authorization plugins to [set permissions on service accounts](/docs/reference/access-authn-authz/rbac/#service-account-permissions).
 
-To use a non-default service account, simply set the `spec.serviceAccountName`
+To use a non-default service account, set the `spec.serviceAccountName`
 field of a pod to the name of the service account you wish to use.
 
 The service account has to exist at the time the pod is created, or it will be rejected.
@@ -160,6 +160,7 @@ Any tokens for non-existent service accounts will be cleaned up by the token con
 ```shell
 kubectl describe secrets/build-robot-secret
 ```
+
 The output is similar to this:
 
 ```
@@ -223,7 +224,7 @@ kubectl get serviceaccounts default -o yaml > ./sa.yaml
 
 The output of the `sa.yaml` file is similar to this:
 
-```shell
+```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -240,7 +241,7 @@ Using your editor of choice (for example `vi`), open the `sa.yaml` file, delete 
 
 The output of the `sa.yaml` file is similar to this:
 
-```shell
+```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -282,15 +283,16 @@ TODO: Test and explain how to use additional non-K8s secrets with an existing se
 
 ## Service Account Token Volume Projection
 
-{{< feature-state for_k8s_version="v1.12" state="beta" >}}
+{{< feature-state for_k8s_version="v1.20" state="stable" >}}
 
 {{< note >}}
-This ServiceAccountTokenVolumeProjection is __beta__ in 1.12 and
-enabled by passing all of the following flags to the API server:
+To enable and use token request projection, you must specify each of the following
+command line arguments to `kube-apiserver`:
 
 * `--service-account-issuer`
+* `--service-account-key-file`
 * `--service-account-signing-key-file`
-* `--service-account-api-audiences`
+* `--api-audiences`
 
 {{< /note >}}
 
@@ -314,13 +316,14 @@ kubectl create -f https://k8s.io/examples/pods/pod-projected-svc-token.yaml
 ```
 
 The kubelet will request and store the token on behalf of the pod, make the
-token available to the pod at a configurable file path, and refresh the token as it approaches expiration. Kubelet proactively rotates the token if it is older than 80% of its total TTL, or if the token is older than 24 hours.
+token available to the pod at a configurable file path, and refresh the token as it approaches expiration.
+The kubelet proactively rotates the token if it is older than 80% of its total TTL, or if the token is older than 24 hours.
 
-The application is responsible for reloading the token when it rotates. Periodic reloading (e.g. once every 5 minutes) is sufficient for most usecases.
+The application is responsible for reloading the token when it rotates. Periodic reloading (e.g. once every 5 minutes) is sufficient for most use cases.
 
 ## Service Account Issuer Discovery
 
-{{< feature-state for_k8s_version="v1.18" state="alpha" >}}
+{{< feature-state for_k8s_version="v1.20" state="beta" >}}
 
 The Service Account Issuer Discovery feature is enabled by enabling the
 `ServiceAccountIssuerDiscovery` [feature gate](/docs/reference/command-line-tools-reference/feature-gates)
@@ -375,11 +378,8 @@ JWKS URI is required to use the `https` scheme.
 
 ## {{% heading "whatsnext" %}}
 
-
 See also:
 
 - [Cluster Admin Guide to Service Accounts](/docs/reference/access-authn-authz/service-accounts-admin/)
 - [Service Account Signing Key Retrieval KEP](https://github.com/kubernetes/enhancements/blob/master/keps/sig-auth/20190730-oidc-discovery.md)
 - [OIDC Discovery Spec](https://openid.net/specs/openid-connect-discovery-1_0.html)
-
-

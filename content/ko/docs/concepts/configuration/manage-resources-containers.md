@@ -47,6 +47,13 @@ feature:
 또는 강제적(시스템이 컨테이너가 제한을 초과하지 않도록 방지)으로 구현할 수 있다. 런타임마다
 다른 방식으로 동일한 제약을 구현할 수 있다.
 
+{{< note >}}
+컨테이너가 자체 메모리 제한을 지정하지만, 메모리 요청을 지정하지 않는 경우, 쿠버네티스는
+제한과 일치하는 메모리 요청을 자동으로 할당한다. 마찬가지로, 컨테이너가 자체 CPU 제한을
+지정하지만, CPU 요청을 지정하지 않는 경우, 쿠버네티스는 제한과 일치하는 CPU 요청을 자동으로
+할당한다.
+{{< /note >}}
+
 ## 리소스 타입
 
 *CPU* 와 *메모리* 는 각각 *리소스 타입* 이다. 리소스 타입에는 기본 단위가 있다.
@@ -112,7 +119,7 @@ CPU는 항상 절대 수량으로 요청되며, 상대적 수량은 아니다.
 
 `memory` 에 대한 제한 및 요청은 바이트 단위로 측정된다.
 E, P, T, G, M, K와 같은 접미사 중 하나를 사용하여 메모리를
-일반 정수 또는 고정 소수점 정수로 표현할 수 있다. Ei, Pi, Ti, Gi, Mi, Ki와
+일반 정수 또는 고정 소수점 숫자로 표현할 수 있다. Ei, Pi, Ti, Gi, Mi, Ki와
 같은 2의 거듭제곱을 사용할 수도 있다. 예를 들어, 다음은 대략 동일한 값을 나타낸다.
 
 ```shell
@@ -132,11 +139,8 @@ metadata:
   name: frontend
 spec:
   containers:
-  - name: db
-    image: mysql
-    env:
-    - name: MYSQL_ROOT_PASSWORD
-      value: "password"
+  - name: app
+    image: images.my-company.example/app:v4
     resources:
       requests:
         memory: "64Mi"
@@ -144,8 +148,8 @@ spec:
       limits:
         memory: "128Mi"
         cpu: "500m"
-  - name: wp
-    image: wordpress
+  - name: log-aggregator
+    image: images.my-company.example/log-aggregator:v6
     resources:
       requests:
         memory: "64Mi"
@@ -227,7 +231,7 @@ kubelet은 파드의 컨테이너를 시작할 때, CPU와 메모리 제한을
 
 파드는 스크래치 공간, 캐싱 및 로그에 대해 임시 로컬 스토리지를 사용한다.
 kubelet은 로컬 임시 스토리지를 사용하여 컨테이너에
-[`emptyDir`](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
+[`emptyDir`](/ko/docs/concepts/storage/volumes/#emptydir)
 {{< glossary_tooltip term_id="volume" text="볼륨" >}}을 마운트하기 위해 파드에 스크래치 공간을 제공할 수 있다.
 
 kubelet은 이러한 종류의 스토리지를 사용하여
@@ -292,7 +296,7 @@ kubelet은 사용 중인 로컬 스토리지 양을 측정할 수 있다. 이것
 제공한다.
 
 - `LocalStorageCapacityIsolation`
-  [기능 게이트](/docs/reference/command-line-tools-reference/feature-gates/)(이
+  [기능 게이트](/ko/docs/reference/command-line-tools-reference/feature-gates/)(이
   기능이 기본적으로 설정되어 있음)를 활성화하고,
 - 로컬 임시 스토리지에 대한 지원되는 구성 중 하나를
   사용하여 노드를 설정한다.
@@ -313,7 +317,7 @@ _임시-스토리지_ 를 사용하여 로컬 임시 저장소를 관리할 수 
 * `spec.containers[].resources.requests.ephemeral-storage`
 
 `ephemeral-storage` 에 대한 제한 및 요청은 바이트 단위로 측정된다. E, P, T, G, M, K와
-같은 접미사 중 하나를 사용하여 스토리지를 일반 정수 또는 고정 소수점 정수로 표현할 수 있다.
+같은 접미사 중 하나를 사용하여 스토리지를 일반 정수 또는 고정 소수점 숫자로 표현할 수 있다.
 Ei, Pi, Ti, Gi, Mi, Ki와 같은 2의 거듭제곱을 사용할 수도 있다.
 예를 들어, 다음은 대략 동일한 값을 나타낸다.
 
@@ -330,18 +334,15 @@ metadata:
   name: frontend
 spec:
   containers:
-  - name: db
-    image: mysql
-    env:
-    - name: MYSQL_ROOT_PASSWORD
-      value: "password"
+  - name: app
+    image: images.my-company.example/app:v4
     resources:
       requests:
         ephemeral-storage: "2Gi"
       limits:
         ephemeral-storage: "4Gi"
-  - name: wp
-    image: wordpress
+  - name: log-aggregator
+    image: images.my-company.example/log-aggregator:v6
     resources:
       requests:
         ephemeral-storage: "2Gi"
@@ -441,7 +442,7 @@ kubelet은 각 `emptyDir` 볼륨, 컨테이너 로그 디렉터리 및 쓰기 �
 프로젝트 쿼터를 사용하려면, 다음을 수행해야 한다.
 
 * kubelet 구성에서 `LocalStorageCapacityIsolationFSQuotaMonitoring=true`
-  [기능 게이트](/docs/reference/command-line-tools-reference/feature-gates/)를
+  [기능 게이트](/ko/docs/reference/command-line-tools-reference/feature-gates/)를
   활성화한다.
 
 * 루트 파일시스템(또는 선택적인 런타임 파일시스템)에
@@ -599,6 +600,10 @@ spec:
         example.com/foo: 1
 ```
 
+## PID 제한
+
+프로세스 ID(PID) 제한은 kubelet의 구성에 대해 주어진 파드가 사용할 수 있는 PID 수를 제한할 수 있도록 허용한다. 자세한 내용은 [Pid 제한](/docs/concepts/policy/pid-limiting/)을 참고한다.
+
 ## 문제 해결
 
 ### 내 파드가 failedScheduling 이벤트 메시지로 보류 중이다
@@ -657,7 +662,7 @@ Allocated resources:
   (Total limits may be over 100 percent, i.e., overcommitted.)
   CPU Requests    CPU Limits    Memory Requests    Memory Limits
   ------------    ----------    ---------------    -------------
-  680m (34%)      400m (20%)    920Mi (12%)        1070Mi (14%)
+  680m (34%)      400m (20%)    920Mi (11%)        1070Mi (13%)
 ```
 
 위의 출력에서, ​파드가 1120m 이상의 CPU 또는 6.23Gi의 메모리를
@@ -757,6 +762,4 @@ LastState: map[terminated:map[exitCode:137 reason:OOM Killed startedAt:2015-07-0
 
 * [ResourceRequirements](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#resourcerequirements-v1-core) API 레퍼런스 읽어보기
 
-* XFS의 [프로젝트 쿼터](http://xfs.org/docs/xfsdocs-xml-dev/XFS_User_Guide/tmp/en-US/html/xfs-quotas.html)에 대해 읽어보기
-
-
+* XFS의 [프로젝트 쿼터](https://xfs.org/docs/xfsdocs-xml-dev/XFS_User_Guide/tmp/en-US/html/xfs-quotas.html)에 대해 읽어보기

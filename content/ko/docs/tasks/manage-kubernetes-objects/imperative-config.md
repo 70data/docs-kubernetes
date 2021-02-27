@@ -13,7 +13,7 @@ weight: 40
 ## {{% heading "prerequisites" %}}
 
 
-[`kubectl`](/docs/tasks/tools/install-kubectl/)을 설치한다.
+[`kubectl`](/ko/docs/tasks/tools/install-kubectl/)을 설치한다.
 
 {{< include "task-tutorial-prereqs.md" >}} {{< version-check >}}
 
@@ -63,6 +63,18 @@ weight: 40
 사용할 수 있다.
 
 * `kubectl delete -f <파일명|url>`
+
+{{< note >}}
+구성 파일이 `metadata` 섹션에서 `name` 필드 대신 `generateName`
+필드를 지정한 경우, `kubectl delete -f <filename|url>` 을 사용하여
+오브젝트를 삭제할 수 없다.
+오브젝트를 삭제하려면 다른 플래그를 사용해야 한다. 예를 들면, 다음과 같다.
+
+```shell
+kubectl delete <type> <name>
+kubectl delete <type> -l <label>
+```
+{{< /note >}}
 
 ## 오브젝트 확인 방법
 
@@ -147,8 +159,8 @@ template:
 
 ## {{% heading "whatsnext" %}}
 
+
 * [명령형 커맨드를 이용한 쿠버네티스 오브젝트 관리하기](/ko/docs/tasks/manage-kubernetes-objects/imperative-command/)
 * [오브젝트 구성을 이용하여 쿠버네티스 오브젝트 관리하기 (선언형)](/ko/docs/tasks/manage-kubernetes-objects/declarative-config/)
-* [Kubectl 커멘드 참조](/docs/reference/generated/kubectl/kubectl/)
+* [Kubectl 커맨드 참조](/docs/reference/generated/kubectl/kubectl-commands/)
 * [쿠버네티스 API 참조](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/)
-

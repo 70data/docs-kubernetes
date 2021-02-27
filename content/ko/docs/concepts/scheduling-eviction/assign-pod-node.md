@@ -1,4 +1,8 @@
 ---
+
+
+
+
 title: 노드에 파드 할당하기
 content_type: concept
 weight: 50
@@ -62,24 +66,14 @@ spec:
 {{< codenew file="pods/pod-nginx.yaml" >}}
 
 그런 다음에 `kubectl apply -f https://k8s.io/examples/pods/pod-nginx.yaml` 을
-실행하면, 레이블이 붙여진 노드에 파드가 스케줄 된다.
+실행하면, 레이블이 붙여진 노드에 파드가 스케줄된다.
 `kubectl get pods -o wide` 를 실행해서 파드가 할당된
 "NODE" 를 보면 작동하는지 검증할 수 있다.
 
 ## 넘어가기 전에: 내장 노드 레이블들 {#built-in-node-labels}
 
 [붙인](#1-단계-노드에-레이블-붙이기) 레이블뿐만 아니라, 노드에는
-표준 레이블 셋이 미리 채워져 있다. 이 레이블들은 다음과 같다.
-
-* [`kubernetes.io/hostname`](/docs/reference/kubernetes-api/labels-annotations-taints/#kubernetes-io-hostname)
-* [`failure-domain.beta.kubernetes.io/zone`](/docs/reference/kubernetes-api/labels-annotations-taints/#failure-domainbetakubernetesiozone)
-* [`failure-domain.beta.kubernetes.io/region`](/docs/reference/kubernetes-api/labels-annotations-taints/#failure-domainbetakubernetesioregion)
-* [`topology.kubernetes.io/zone`](/docs/reference/kubernetes-api/labels-annotations-taints/#topologykubernetesiozone)
-* [`topology.kubernetes.io/region`](/docs/reference/kubernetes-api/labels-annotations-taints/#topologykubernetesiozone)
-* [`beta.kubernetes.io/instance-type`](/docs/reference/kubernetes-api/labels-annotations-taints/#beta-kubernetes-io-instance-type)
-* [`node.kubernetes.io/instance-type`](/docs/reference/kubernetes-api/labels-annotations-taints/#nodekubernetesioinstance-type)
-* [`kubernetes.io/os`](/docs/reference/kubernetes-api/labels-annotations-taints/#kubernetes-io-os)
-* [`kubernetes.io/arch`](/docs/reference/kubernetes-api/labels-annotations-taints/#kubernetes-io-arch)
+표준 레이블 셋이 미리 채워져 있다. 이들 목록은 [잘 알려진 레이블, 어노테이션 및 테인트](/docs/reference/kubernetes-api/labels-annotations-taints/)를 참고한다.
 
 {{< note >}}
 이 레이블들의 값은 클라우드 공급자에 따라 다르고 신뢰성이 보장되지 않는다.
@@ -110,7 +104,7 @@ spec:
 1. 어피니티/안티-어피니티 언어가 더 표현적이다. 언어는 논리 연산자인 AND 연산으로 작성된
    정확한 매칭 항목 이외에 더 많은 매칭 규칙을 제공한다.
 2. 규칙이 엄격한 요구 사항이 아니라 "유연한(soft)"/"선호(preference)" 규칙을 나타낼 수 있기에 스케줄러가 규칙을 만족할 수 없더라도,
-   파드가 계속 스케줄 되도록 한다.
+   파드가 계속 스케줄되도록 한다.
 3. 노드 자체에 레이블을 붙이기보다는 노드(또는 다른 토폴로지 도메인)에서 실행 중인 다른 파드의 레이블을 제한할 수 있다.
    이를 통해 어떤 파드가 함께 위치할 수 있는지와 없는지에 대한 규칙을 적용할 수 있다.
 
@@ -125,7 +119,7 @@ spec:
 스케줄할 수 있는 노드를 제한할 수 있다.
 
 여기에 현재 `requiredDuringSchedulingIgnoredDuringExecution` 와 `preferredDuringSchedulingIgnoredDuringExecution` 로 부르는
-두 가지 종류의 노드 어피니티가 있다. 전자는 파드가 노드에 스케줄 되도록 *반드시*
+두 가지 종류의 노드 어피니티가 있다. 전자는 파드가 노드에 스케줄되도록 *반드시*
 규칙을 만족해야 하는 것(`nodeSelector` 와 같으나 보다 표현적인 구문을 사용해서)을 지정하고,
 후자는 스케줄러가 시도하려고는 하지만, 보증하지 않는 *선호(preferences)* 를 지정한다는 점에서
 이를 각각 "엄격함(hard)" 과 "유연함(soft)" 으로 생각할 수 있다.
@@ -151,18 +145,61 @@ spec:
 
 예시에서 연산자 `In` 이 사용되고 있는 것을 볼 수 있다. 새로운 노드 어피니티 구문은 다음의 연산자들을 지원한다. `In`, `NotIn`, `Exists`, `DoesNotExist`, `Gt`, `Lt`.
 `NotIn` 과 `DoesNotExist` 를 사용해서 안티-어피니티를 수행하거나,
-특정 노드에서 파드를 쫓아내는 [노드 테인트(taint)](/docs/concepts/configuration/taint-and-toleration/)를 설정할 수 있다.
+특정 노드에서 파드를 쫓아내는 [노드 테인트(taint)](/ko/docs/concepts/scheduling-eviction/taint-and-toleration/)를 설정할 수 있다.
 
-`nodeSelector` 와 `nodeAffinity` 를 모두 지정한다면 파드가 후보 노드에 스케줄 되기 위해서는
+`nodeSelector` 와 `nodeAffinity` 를 모두 지정한다면 파드가 후보 노드에 스케줄되기 위해서는
 *둘 다* 반드시 만족해야 한다.
 
-`nodeAffinity` 유형과 연관된 `nodeSelectorTerms` 를 지정하면, 파드는 `nodeSelectorTerms` 를 **모두** 만족하는 노드에만 스케줄할 수 있다.
+`nodeAffinity` 유형과 연관된 `nodeSelectorTerms` 를 지정하면, `nodeSelectorTerms` 중 **하나라도** 만족시키는 노드에 파드가 스케줄된다.
 
-`nodeSelectorTerms` 와 연관된 여러 `matchExpressions` 를 지정하면, 파드는 `matchExpressions` 이 지정된 것 중 **한 가지**라도 만족하는 노드에만 스케줄할 수 있다.
+`nodeSelectorTerms` 와 연관된 여러 `matchExpressions` 를 지정하면, 파드는 `matchExpressions` 를 **모두** 만족하는 노드에만 스케줄된다.
 
-파드가 스케줄 된 노드의 레이블을 지우거나 변경해도 파드는 제거되지 않는다. 다시 말해서 어피니티 선택은 파드를 스케줄링 하는 시점에만 작동한다.
+파드가 스케줄된 노드의 레이블을 지우거나 변경해도 파드는 제거되지 않는다. 다시 말해서 어피니티 선택은 파드를 스케줄링 하는 시점에만 작동한다.
 
 `preferredDuringSchedulingIgnoredDuringExecution` 의 `weight` 필드의 범위는 1-100이다. 모든 스케줄링 요구 사항 (리소스 요청, RequiredDuringScheduling 어피니티 표현식 등)을 만족하는 각 노드들에 대해 스케줄러는 이 필드의 요소들을 반복해서 합계를 계산하고 노드가 MatchExpressions 에 일치하는 경우 합계에 "가중치(weight)"를 추가한다. 이후에 이 점수는 노드에 대한 다른 우선순위 함수의 점수와 합쳐진다. 전체 점수가 가장 높은 노드를 가장 선호한다.
+
+#### 스케줄링 프로파일당 노드 어피니티
+
+{{< feature-state for_k8s_version="v1.20" state="beta" >}}
+
+여러 [스케줄링 프로파일](/ko/docs/reference/scheduling/config/#여러-프로파일)을 구성할 때
+노드 어피니티가 있는 프로파일을 연결할 수 있는데, 이는 프로파일이 특정 노드 집합에만 적용되는 경우 유용하다.
+이렇게 하려면 [스케줄러 구성](/ko/docs/reference/scheduling/config/)에 있는
+[`NodeAffinity` 플러그인](/ko/docs/reference/scheduling/config/#스케줄링-플러그인-1)의 인수에 `addedAffinity`를 추가한다. 예를 들면
+
+```yaml
+apiVersion: kubescheduler.config.k8s.io/v1beta1
+kind: KubeSchedulerConfiguration
+
+profiles:
+  - schedulerName: default-scheduler
+  - schedulerName: foo-scheduler
+    pluginConfig:
+      - name: NodeAffinity
+        args:
+          addedAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: scheduler-profile
+                  operator: In
+                  values:
+                  - foo
+```
+
+`addedAffinity`는 `.spec.schedulerName`을 `foo-scheduler`로 설정하는 모든 파드에 적용되며
+PodSpec에 지정된 NodeAffinity도 적용된다.
+즉, 파드를 매칭시키려면, 노드가 `addedAffinity`와 파드의 `.spec.NodeAffinity`를 충족해야 한다.
+
+`addedAffinity`는 엔드 유저에게 표시되지 않으므로, 예상치 못한 동작이 일어날 수 있다. 프로파일의
+스케줄러 이름과 명확한 상관 관계가 있는 노드 레이블을 사용하는 것이 좋다.
+
+{{< note >}}
+[데몬셋용 파드를 생성](/ko/docs/concepts/workloads/controllers/daemonset/#기본-스케줄러로-스케줄)하는 데몬셋 컨트롤러는
+스케줄링 프로파일을 인식하지 못한다.
+따라서 `addedAffinity`없이 `default-scheduler`와 같은 스케줄러 프로파일을 유지하는 것이 좋다. 그런 다음 데몬셋의 파드 템플릿이 스케줄러 이름을 사용해야 한다.
+그렇지 않으면, 데몬셋 컨트롤러에 의해 생성된 일부 파드가 스케줄되지 않은 상태로 유지될 수 있다.
+{{< /note >}}
 
 ### 파드간 어피니티와 안티-어피니티
 
@@ -206,13 +243,11 @@ spec:
 `preferredDuringSchedulingIgnoredDuringExecution` 이다. 파드 어피니티 규칙에 의하면 키 "security" 와 값
 "S1"인 레이블이 있는 하나 이상의 이미 실행 중인 파드와 동일한 영역에 있는 경우에만 파드를 노드에 스케줄할 수 있다.
 (보다 정확하게는, 클러스터에 키 "security"와 값 "S1"인 레이블을 가지고 있는 실행 중인 파드가 있는 키
-`failure-domain.beta.kubernetes.io/zone` 와 값 V인 노드가 최소 하나 이상 있고, 노드 N이 키
-`failure-domain.beta.kubernetes.io/zone` 와 일부 값이 V인 레이블을 가진다면 파드는 노드 N에서 실행할 수 있다.)
-파드 안티-어피니티 규칙에 의하면 노드가 이미 키 "security"와 값 "S2"인 레이블을 가진 파드를
-실행하고 있는 파드는 노드에 스케줄되는 것을 선호하지 않는다.
-(만약 `topologyKey` 가 `failure-domain.beta.kubernetes.io/zone` 라면 노드가 키
-"security"와 값 "S2"를 레이블로 가진 파드와
-동일한 영역에 있는 경우, 노드에 파드를 예약할 수 없음을 의미한다.)
+`topology.kubernetes.io/zone` 와 값 V인 노드가 최소 하나 이상 있고,
+노드 N이 키 `topology.kubernetes.io/zone` 와
+일부 값이 V인 레이블을 가진다면 파드는 노드 N에서 실행할 수 있다.)
+파드 안티-어피니티 규칙에 의하면 파드는 키 "security"와 값 "S2"인 레이블을 가진 파드와
+동일한 영역의 노드에 스케줄되지 않는다.
 [디자인 문서](https://git.k8s.io/community/contributors/design-proposals/scheduling/podaffinity.md)를 통해
 `requiredDuringSchedulingIgnoredDuringExecution` 와 `preferredDuringSchedulingIgnoredDuringExecution` 의
 파드 어피니티와 안티-어피니티에 대한 많은 예시를 맛볼 수 있다.
@@ -222,10 +257,11 @@ spec:
 원칙적으로, `topologyKey` 는 적법한 어느 레이블-키도 될 수 있다.
 하지만, 성능과 보안상의 이유로 topologyKey에는 몇 가지 제약조건이 있다.
 
-1. 어피니티와 `requiredDuringSchedulingIgnoredDuringExecution` 파드 안티-어피니티는 대해
-`topologyKey` 가 비어있는 것을 허용하지 않는다.
-2. `requiredDuringSchedulingIgnoredDuringExecution` 파드 안티-어피니티에서 `topologyKey` 를 `kubernetes.io/hostname` 로 제한하기 위해 어드미션 컨트롤러 `LimitPodHardAntiAffinityTopology` 가 도입되었다. 사용자 지정 토폴로지를에 사용할 수 있도록 하려면, 어드미션 컨트롤러를 수정하거나 간단히 이를 비활성화 할 수 있다.
-3. `preferredDuringSchedulingIgnoredDuringExecution` 파드 안티-어피니티는 `topologyKey` 가 비어있는 것을 허용하지 않는다.
+1. 파드 어피니티에서 `requiredDuringSchedulingIgnoredDuringExecution` 와 `preferredDuringSchedulingIgnoredDuringExecution` 는
+`topologyKey` 의 빈 값을 허용하지 않는다.
+2. 파드 안티-어피니티에서도 `requiredDuringSchedulingIgnoredDuringExecution` 와 `preferredDuringSchedulingIgnoredDuringExecution` 는
+`topologyKey` 의 빈 값을 허용하지 않는다.
+3. `requiredDuringSchedulingIgnoredDuringExecution` 파드 안티-어피니티에서 `topologyKey` 를 `kubernetes.io/hostname` 로 제한하기 위해 어드미션 컨트롤러 `LimitPodHardAntiAffinityTopology` 가 도입되었다. 사용자 지정 토폴로지를 사용할 수 있도록 하려면, 어드미션 컨트롤러를 수정하거나 아니면 간단히 이를 비활성화해야 한다.
 4. 위의 경우를 제외하고, `topologyKey` 는 적법한 어느 레이블-키도 가능하다.
 
 `labelSelector` 와 `topologyKey` 외에도 `labelSelector` 와 일치해야 하는 네임스페이스 목록 `namespaces` 를
@@ -388,7 +424,7 @@ spec:
 ## {{% heading "whatsnext" %}}
 
 
-[테인트](/docs/concepts/configuration/taint-and-toleration/)는 노드가 특정 파드들을 *쫓아내게* 할 수 있다.
+[테인트](/ko/docs/concepts/scheduling-eviction/taint-and-toleration/)는 노드가 특정 파드들을 *쫓아낼* 수 있다.
 
 [노드 어피니티](https://git.k8s.io/community/contributors/design-proposals/scheduling/nodeaffinity.md)와
 [파드간 어피니티/안티-어피니티](https://git.k8s.io/community/contributors/design-proposals/scheduling/podaffinity.md)에 대한 디자인 문서에는
@@ -397,5 +433,3 @@ spec:
 파드가 노드에 할당되면 kubelet은 파드를 실행하고 노드의 로컬 리소스를 할당한다.
 [토폴로지 매니저](/docs/tasks/administer-cluster/topology-manager/)는
 노드 수준의 리소스 할당 결정에 참여할 수 있다.
-
-

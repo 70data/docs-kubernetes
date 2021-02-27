@@ -1,4 +1,10 @@
 ---
+
+
+
+
+
+
 title: 퍼시스턴트 볼륨
 feature:
   title: 스토리지 오케스트레이션
@@ -13,22 +19,19 @@ weight: 20
 
 이 페이지는 쿠버네티스의 _퍼시스턴트 볼륨_ 의 현재 상태를 설명한다. [볼륨](/ko/docs/concepts/storage/volumes/)에 대해 익숙해지는 것을 추천한다.
 
-
-
-
 <!-- body -->
 
 ## 소개
 
 스토리지 관리는 컴퓨트 인스턴스 관리와는 별개의 문제다. 퍼시스턴트볼륨 서브시스템은 사용자 및 관리자에게 스토리지 사용 방법에서부터 스토리지가 제공되는 방법에 대한 세부 사항을 추상화하는 API를 제공한다. 이를 위해 퍼시스턴트볼륨 및 퍼시스턴트볼륨클레임이라는 두 가지 새로운 API 리소스를 소개한다.
 
-_퍼시스턴트볼륨_ (PV)은 관리자가 프로비저닝하거나 [스토리지 클래스](/docs/concepts/storage/storage-classes/)를 사용하여 동적으로 프로비저닝한 클러스터의 스토리지이다. 노드가 클러스터 리소스인 것처럼 PV는 클러스터 리소스이다. PV는 Volumes와 같은 볼륨 플러그인이지만, PV를 사용하는 개별 파드와는 별개의 라이프사이클을 가진다. 이 API 오브젝트는 NFS, iSCSI 또는 클라우드 공급자별 스토리지 시스템 등 스토리지 구현에 대한 세부 정보를 담아낸다.
+_퍼시스턴트볼륨_ (PV)은 관리자가 프로비저닝하거나 [스토리지 클래스](/ko/docs/concepts/storage/storage-classes/)를 사용하여 동적으로 프로비저닝한 클러스터의 스토리지이다. 노드가 클러스터 리소스인 것처럼 PV는 클러스터 리소스이다. PV는 Volumes와 같은 볼륨 플러그인이지만, PV를 사용하는 개별 파드와는 별개의 라이프사이클을 가진다. 이 API 오브젝트는 NFS, iSCSI 또는 클라우드 공급자별 스토리지 시스템 등 스토리지 구현에 대한 세부 정보를 담아낸다.
 
-_퍼시스턴트볼륨클레임_ (PVC)은 사용자의 스토리지에 대한 요청이다. 파드와 비슷하다. 파드는 노드 리소스를 사용하고 PVC는 PV 리소스를 사용한다. 파드는 특정 수준의 리소스(CPU 및 메모리)를 요청할 수 있다. 클레임은 특정 크기 및 접근 모드를 요청할 수 있다(예: 한 번 읽기/쓰기 또는 여러 번 읽기 전용으로 마운트 할 수 있음).
+_퍼시스턴트볼륨클레임_ (PVC)은 사용자의 스토리지에 대한 요청이다. 파드와 비슷하다. 파드는 노드 리소스를 사용하고 PVC는 PV 리소스를 사용한다. 파드는 특정 수준의 리소스(CPU 및 메모리)를 요청할 수 있다. 클레임은 특정 크기 및 접근 모드를 요청할 수 있다(예: ReadWriteOnce, ReadOnlyMany 또는 ReadWriteMany로 마운트 할 수 있음. [AccessModes](#접근-모드) 참고).
 
 퍼시스턴트볼륨클레임을 사용하면 사용자가 추상화된 스토리지 리소스를 사용할 수 있지만, 다른 문제들 때문에 성능과 같은 다양한 속성을 가진 퍼시스턴트볼륨이 필요한 경우가 일반적이다. 클러스터 관리자는 사용자에게 해당 볼륨의 구현 방법에 대한 세부 정보를 제공하지 않고 단순히 크기와 접근 모드와는 다른 방식으로 다양한 퍼시스턴트볼륨을 제공할 수 있어야 한다. 이러한 요구에는 _스토리지클래스_ 리소스가 있다.
 
-[실습 예제와 함께 상세한 내용](/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)을 참고하길 바란다.
+[실습 예제와 함께 상세한 내용](/ko/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)을 참고하길 바란다.
 
 ## 볼륨과 클레임 라이프사이클
 
@@ -47,7 +50,7 @@ PV를 프로비저닝 할 수 있는 두 가지 방법이 있다: 정적(static)
 관리자가 생성한 정적 PV가 사용자의 퍼시스턴트볼륨클레임과 일치하지 않으면
 클러스터는 PVC를 위해 특별히 볼륨을 동적으로 프로비저닝 하려고 시도할 수 있다.
 이 프로비저닝은 스토리지클래스를 기반으로 한다. PVC는
-[스토리지 클래스](/docs/concepts/storage/storage-classes/)를
+[스토리지 클래스](/ko/docs/concepts/storage/storage-classes/)를
 요청해야 하며 관리자는 동적 프로비저닝이 발생하도록 해당 클래스를 생성하고 구성해야 한다.
 `""` 클래스를 요청하는 클레임은 동적 프로비저닝을 효과적으로
 비활성화한다.
@@ -132,7 +135,7 @@ Events:            <none>
 
 #### Delete(삭제)
 
-`Delete` 반환 정책을 지원하는 볼륨 플러그인의 경우, 삭제는 쿠버네티스에서 퍼시스턴트볼륨 오브젝트와 외부 인프라(예: AWS EBS, GCE PD, Azure Disk 또는 Cinder 볼륨)의 관련 스토리지 자산을 모두 삭제한다. 동적으로 프로비저닝된 볼륨은 [스토리지클래스의 반환 정책](#반환-정책)을 상속하며 기본값은 `Delete`이다. 관리자는 사용자의 기대에 따라 스토리지클래스를 구성해야 한다. 그렇지 않으면 PV를 생성한 후 PV를 수정하거나 패치해야 한다. [퍼시스턴트볼륨의 반환 정책 변경](/docs/tasks/administer-cluster/change-pv-reclaim-policy/)을 참고하길 바란다.
+`Delete` 반환 정책을 지원하는 볼륨 플러그인의 경우, 삭제는 쿠버네티스에서 퍼시스턴트볼륨 오브젝트와 외부 인프라(예: AWS EBS, GCE PD, Azure Disk 또는 Cinder 볼륨)의 관련 스토리지 자산을 모두 삭제한다. 동적으로 프로비저닝된 볼륨은 [스토리지클래스의 반환 정책](#반환-정책)을 상속하며 기본값은 `Delete`이다. 관리자는 사용자의 기대에 따라 스토리지클래스를 구성해야 한다. 그렇지 않으면 PV를 생성한 후 PV를 수정하거나 패치해야 한다. [퍼시스턴트볼륨의 반환 정책 변경](/ko/docs/tasks/administer-cluster/change-pv-reclaim-policy/)을 참고하길 바란다.
 
 #### Recycle(재활용)
 
@@ -142,7 +145,11 @@ Events:            <none>
 
 기본 볼륨 플러그인에서 지원하는 경우 `Recycle` 반환 정책은 볼륨에서 기본 스크럽(`rm -rf /thevolume/*`)을 수행하고 새 클레임에 다시 사용할 수 있도록 한다.
 
-그러나 관리자는 [여기](/docs/admin/kube-controller-manager/)에 설명된대로 쿠버네티스 컨트롤러 관리자 커맨드라인 인자(command line arguments)를 사용하여 사용자 정의 재활용 파드 템플릿을 구성할 수 있다. 사용자 정의 재활용 파드 템플릿에는 아래 예와 같이 `volumes` 명세가 포함되어야 한다.
+그러나 관리자는 [레퍼런스](/docs/reference/command-line-tools-reference/kube-controller-manager/)에
+설명된 대로 쿠버네티스 컨트롤러 관리자 커맨드라인 인자(command line arguments)를
+사용하여 사용자 정의 재활용 파드 템플릿을 구성할 수 있다.
+사용자 정의 재활용 파드 템플릿에는 아래 예와 같이 `volumes` 명세가
+포함되어야 한다.
 
 ```yaml
 apiVersion: v1
@@ -167,6 +174,47 @@ spec:
 
 그러나 `volumes` 부분의 사용자 정의 재활용 파드 템플릿에 지정된 특정 경로는 재활용되는 볼륨의 특정 경로로 바뀐다.
 
+### 퍼시스턴트볼륨 예약
+
+컨트롤 플레인은 클러스터에서 [퍼시스턴트볼륨클레임을 일치하는 퍼시스턴트볼륨에 바인딩](#바인딩)할
+수 있다. 그러나, PVC를 특정 PV에 바인딩하려면, 미리 바인딩해야 한다.
+
+퍼시스턴트볼륨클레임에서 퍼시스턴트볼륨을 지정하여, 특정 PV와 PVC 간의 바인딩을 선언한다.
+퍼시스턴트볼륨이 존재하고 `claimRef` 필드를 통해 퍼시스턴트볼륨클레임을 예약하지 않은 경우, 퍼시스턴트볼륨 및 퍼시스턴트볼륨클레임이 바인딩된다.
+
+바인딩은 노드 선호도(affinity)를 포함하여 일부 볼륨 일치(matching) 기준과 관계없이 발생한다.
+컨트롤 플레인은 여전히 [스토리지 클래스](/ko/docs/concepts/storage/storage-classes/), 접근 모드 및 요청된 스토리지 크기가 유효한지 확인한다.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: foo-pvc
+  namespace: foo
+spec:
+  storageClassName: "" # 빈 문자열은 명시적으로 설정해야 하며 그렇지 않으면 기본 스토리지클래스가 설정됨
+  volumeName: foo-pv
+  ...
+```
+
+이 메서드는 퍼시스턴트볼륨에 대한 바인딩 권한을 보장하지 않는다. 다른 퍼시스턴트볼륨클레임에서 지정한 PV를 사용할 수 있는 경우, 먼저 해당 스토리지 볼륨을 예약해야 한다. PV의 `claimRef` 필드에 관련 퍼시스턴트볼륨클레임을 지정하여 다른 PVC가 바인딩할 수 없도록 한다.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: foo-pv
+spec:
+  storageClassName: ""
+  claimRef:
+    name: foo-pvc
+    namespace: foo
+  ...
+```
+
+이는 기존 PV를 재사용하는 경우를 포함하여 `claimPolicy` 가
+`Retain` 으로 설정된 퍼시스턴트볼륨을 사용하려는 경우에 유용하다.
+
 ### 퍼시스턴트 볼륨 클레임 확장
 
 {{< feature-state for_k8s_version="v1.11" state="beta" >}}
@@ -183,7 +231,7 @@ spec:
 * Azure Disk
 * Portworx
 * FlexVolumes
-* CSI
+* {{< glossary_tooltip text="CSI" term_id="csi" >}}
 
 스토리지 클래스의 `allowVolumeExpansion` 필드가 true로 설정된 경우에만 PVC를 확장할 수 있다.
 
@@ -228,7 +276,7 @@ FlexVolume은 파드 재시작 시 크기를 조정할 수 있다.
 {{< feature-state for_k8s_version="v1.15" state="beta" >}}
 
 {{< note >}}
-사용 중인 PVC 확장은 쿠버네티스 1.15 이후 버전에서는 베타로, 1.11 이후 버전에서는 알파로 제공된다. `ExpandInUsePersistentVolumes` 기능을 사용하도록 설정해야 한다. 베타 기능의 경우 여러 클러스터에서 자동으로 적용된다. 자세한 내용은 [기능 게이트](/docs/reference/command-line-tools-reference/feature-gates/) 문서를 참고한다.
+사용 중인 PVC 확장은 쿠버네티스 1.15 이후 버전에서는 베타로, 1.11 이후 버전에서는 알파로 제공된다. `ExpandInUsePersistentVolumes` 기능을 사용하도록 설정해야 한다. 베타 기능의 경우 여러 클러스터에서 자동으로 적용된다. 자세한 내용은 [기능 게이트](/ko/docs/reference/command-line-tools-reference/feature-gates/) 문서를 참고한다.
 {{< /note >}}
 
 이 경우 기존 PVC를 사용하는 파드 또는 디플로이먼트를 삭제하고 다시 만들 필요가 없다.
@@ -244,40 +292,59 @@ FlexVolume의 크기 조정은 기본 드라이버가 크기 조정을 지원하
 {{< /note >}}
 
 {{< note >}}
-EBS 볼륨 확장은 시간이 많이 걸리는 작업이다. 또한 6시간마다 한 번의 수정을 할 수 있는 볼륨별 쿼터(quota)가 있다.
+EBS 볼륨 확장은 시간이 많이 걸리는 작업이다. 또한 6시간마다 한 번의 수정을 할 수 있는 볼륨별 쿼터가 있다.
 {{< /note >}}
+
+#### 볼륨 확장 시 오류 복구
+
+기본 스토리지 확장에 실패하면, 클러스터 관리자가 수동으로 퍼시스턴트 볼륨 클레임(PVC) 상태를 복구하고 크기 조정 요청을 취소할 수 있다. 그렇지 않으면, 컨트롤러가 관리자 개입 없이 크기 조정 요청을 계속해서 재시도한다.
+
+1. 퍼시스턴트볼륨클레임(PVC)에 바인딩된 퍼시스턴트볼륨(PV)을 `Retain` 반환 정책으로 표시한다.
+2. PVC를 삭제한다. PV에는 `Retain` 반환 정책이 있으므로 PVC를 재생성할 때 데이터가 손실되지 않는다.
+3. 새 PVC를 바인딩할 수 있도록 PV 명세에서 `claimRef` 항목을 삭제한다. 그러면 PV가 `Available` 상태가 된다.
+4. PV 보다 작은 크기로 PVC를 다시 만들고 PVC의 `volumeName` 필드를 PV 이름으로 설정한다. 이것은 새 PVC를 기존 PV에 바인딩해야 한다.
+5. PV의 반환 정책을 복원하는 것을 잊지 않는다.
 
 
 ## 퍼시스턴트 볼륨의 유형
 
 퍼시스턴트볼륨 유형은 플러그인으로 구현된다. 쿠버네티스는 현재 다음의 플러그인을 지원한다.
 
-* GCEPersistentDisk
-* AWSElasticBlockStore
-* AzureFile
-* AzureDisk
-* CSI
-* FC (파이버 채널)
-* FlexVolume
-* Flocker
-* NFS
-* iSCSI
-* RBD (Ceph Block Device)
-* CephFS
-* Cinder (OpenStack 블록 스토리지)
-* Glusterfs
-* VsphereVolume
-* Quobyte Volumes
-* HostPath (단일 노드 테스트 전용 – 로컬 스토리지는 어떤 방식으로도 지원되지 않으며 다중-노드 클러스터에서 작동하지 않음)
-* Portworx Volumes
-* ScaleIO Volumes
-* StorageOS
+* [`awsElasticBlockStore`](/ko/docs/concepts/storage/volumes/#awselasticblockstore) - AWS Elastic Block Store (EBS)
+* [`azureDisk`](/ko/docs/concepts/storage/volumes/#azuredisk) - Azure Disk
+* [`azureFile`](/ko/docs/concepts/storage/volumes/#azurefile) - Azure File
+* [`cephfs`](/ko/docs/concepts/storage/volumes/#cephfs) - CephFS 볼륨
+* [`cinder`](/ko/docs/concepts/storage/volumes/#cinder) - Cinder (오픈스택 블록 스토리지)
+  (**사용 중단**)
+* [`csi`](/ko/docs/concepts/storage/volumes/#csi) - 컨테이너 스토리지 인터페이스 (CSI)
+* [`fc`](/ko/docs/concepts/storage/volumes/#fc) - Fibre Channel (FC) 스토리지
+* [`flexVolume`](/ko/docs/concepts/storage/volumes/#flexVolume) - FlexVolume
+* [`flocker`](/ko/docs/concepts/storage/volumes/#flocker) - Flocker 스토리지
+* [`gcePersistentDisk`](/ko/docs/concepts/storage/volumes/#gcepersistentdisk) - GCE Persistent Disk
+* [`glusterfs`](/ko/docs/concepts/storage/volumes/#glusterfs) - Glusterfs 볼륨
+* [`hostPath`](/ko/docs/concepts/storage/volumes/#hostpath) - HostPath 볼륨
+  (단일 노드 테스트 전용. 다중-노드 클러스터에서 작동하지 않음.
+  대신 `로컬` 볼륨 사용 고려)
+* [`iscsi`](/ko/docs/concepts/storage/volumes/#iscsi) - iSCSI (SCSI over IP) 스토리지
+* [`local`](/ko/docs/concepts/storage/volumes/#local) - 노드에 마운트된
+  로컬 스토리지 디바이스
+* [`nfs`](/ko/docs/concepts/storage/volumes/#nfs) - 네트워크 파일 시스템 (NFS) 스토리지
+* `photonPersistentDisk` - Photon 컨트롤러 퍼시스턴트 디스크.
+  (이 볼륨 유형은 해당 클라우드 공급자가 없어진 이후 더 이상
+  작동하지 않는다.)
+* [`portworxVolume`](/ko/docs/concepts/storage/volumes/#portworxvolume) - Portworx 볼륨
+* [`quobyte`](/ko/docs/concepts/storage/volumes/#quobyte) - Quobyte 볼륨
+* [`rbd`](/ko/docs/concepts/storage/volumes/#rbd) - Rados Block Device (RBD) 볼륨
+* [`scaleIO`](/ko/docs/concepts/storage/volumes/#scaleio) - ScaleIO 볼륨
+  (**사용 중단**)
+* [`storageos`](/ko/docs/concepts/storage/volumes/#storageos) - StorageOS 볼륨
+* [`vsphereVolume`](/ko/docs/concepts/storage/volumes/#vspherevolume) - vSphere VMDK 볼륨
 
 ## 퍼시스턴트 볼륨
 
 각 PV에는 스펙과 상태(볼륨의 명세와 상태)가 포함된다.
 퍼시스턴트볼륨 오브젝트의 이름은 유효한
-[DNS 서브도메인 이름](/ko/docs/concepts/overview/working-with-objects/names/#dns-서브도메인-이름들)이어야 한다.
+[DNS 서브도메인 이름](/ko/docs/concepts/overview/working-with-objects/names/#dns-서브도메인-이름)이어야 한다.
 
 ```yaml
 apiVersion: v1
@@ -376,7 +443,7 @@ CLI에서 접근 모드는 다음과 같이 약어로 표시된다.
 ### 클래스
 
 PV는 `storageClassName` 속성을
-[스토리지클래스](/docs/concepts/storage/storage-classes/)의
+[스토리지클래스](/ko/docs/concepts/storage/storage-classes/)의
 이름으로 설정하여 지정하는 클래스를 가질 수 있다.
 특정 클래스의 PV는 해당 클래스를 요청하는 PVC에만 바인딩될 수 있다.
 `storageClassName`이 없는 PV에는 클래스가 없으며 특정 클래스를 요청하지 않는 PVC에만
@@ -449,8 +516,7 @@ CLI는 PV에 바인딩된 PVC의 이름을 표시한다.
 
 각 PVC에는 스펙과 상태(클레임의 명세와 상태)가 포함된다.
 퍼시스턴트볼륨클레임 오브젝트의 이름은 유효한
-[DNS 서브도메인 이름](/ko/docs/concepts/overview/working-with-objects/names/#dns-서브도메인-이름들)이어야
-한다.
+[DNS 서브도메인 이름](/ko/docs/concepts/overview/working-with-objects/names/#dns-서브도메인-이름)이어야 한다.
 
 ```yaml
 apiVersion: v1
@@ -496,7 +562,7 @@ spec:
 ### 클래스
 
 클레임은 `storageClassName` 속성을 사용하여
-[스토리지클래스](/docs/concepts/storage/storage-classes/)의 이름을 지정하여
+[스토리지클래스](/ko/docs/concepts/storage/storage-classes/)의 이름을 지정하여
 특정 클래스를 요청할 수 있다.
 요청된 클래스의 PV(PVC와 동일한 `storageClassName`을 갖는 PV)만 PVC에
 바인딩될 수 있다.
@@ -666,12 +732,10 @@ spec:
 
 ## 볼륨 스냅샷 및 스냅샷 지원에서 볼륨 복원
 
-{{< feature-state for_k8s_version="v1.17" state="beta" >}}
+{{< feature-state for_k8s_version="v1.20" state="stable" >}}
 
-CSI 볼륨 플러그인만 지원하도록 볼륨 스냅샷 기능이 추가되었다. 자세한 내용은 [볼륨 스냅샷](/docs/concepts/storage/volume-snapshots/)을 참고한다.
-
-볼륨 스냅샷 데이터 소스에서 볼륨 복원을 지원하려면 apiserver와 controller-manager에서
-`VolumeSnapshotDataSource` 기능 게이트를 활성화한다.
+볼륨 스냅 샷은 아웃-오브-트리 CSI 볼륨 플러그인만 지원한다. 자세한 내용은 [볼륨 스냅샷](/ko/docs/concepts/storage/volume-snapshots/)을 참조한다.
+인-트리 볼륨 플러그인은 사용 중단 되었다. [볼륨 플러그인 FAQ](https://github.com/kubernetes/community/blob/master/sig-storage/volume-plugin-faq.md)에서 사용 중단된 볼륨 플러그인에 대해 확인할 수 있다.
 
 ### 볼륨 스냅샷에서 퍼시스턴트볼륨클레임 생성 {#create-persistent-volume-claim-from-volume-snapshot}
 
@@ -745,9 +809,9 @@ spec:
   ## {{% heading "whatsnext" %}}
 
 
-* [퍼시스턴트볼륨 생성](/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolume)에 대해 자세히 알아보기
-* [퍼시스턴트볼륨클레임 생성](/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#create-a-persistentvolumeclaim)에 대해 자세히 알아보기
-* [퍼시스턴트 스토리지 설계 문서](https://git.k8s.io/community/contributors/design-proposals/storage/persistent-storage.md) 읽기
+* [퍼시스턴트볼륨 생성](/ko/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#퍼시스턴트볼륨-생성하기)에 대해 자세히 알아보기
+* [퍼시스턴트볼륨클레임 생성](/ko/docs/tasks/configure-pod-container/configure-persistent-volume-storage/#퍼시스턴트볼륨클레임-생성하기)에 대해 자세히 알아보기
+* [퍼시스턴트 스토리지 설계 문서](https://git.k8s.io/community/contributors/design-proposals/storage/persistent-storage.md) 읽어보기
 
 ### 참고
 
@@ -755,4 +819,3 @@ spec:
 * [PersistentVolumeSpec](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#persistentvolumespec-v1-core)
 * [퍼시스턴트볼륨클레임](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#persistentvolumeclaim-v1-core)
 * [PersistentVolumeClaimSpec](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#persistentvolumeclaimspec-v1-core)
-

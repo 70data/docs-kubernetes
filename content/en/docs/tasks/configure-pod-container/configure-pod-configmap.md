@@ -201,6 +201,9 @@ allow.textmode=true
 how.nice.to.look=fairlyNice
 ```
 
+When `kubectl` creates a ConfigMap from inputs that are not ASCII or UTF-8, the tool puts these into the `binaryData` field of the ConfigMap, and not in `data`. Both text and binary data sources can be combined in one ConfigMap.
+If you want to view the `binaryData` keys (and their values) in a ConfigMap, you can run `kubectl get configmap -o jsonpath='{.binaryData}' <name>`.
+
 Use the option `--from-env-file` to create a ConfigMap from an env-file, for example:
 
 ```shell
@@ -532,7 +535,7 @@ This functionality is available in Kubernetes v1.6 and later.
 
 ## Use ConfigMap-defined environment variables in Pod commands
 
-You can use ConfigMap-defined environment variables in the `command` section of the Pod specification using the `$(VAR_NAME)` Kubernetes substitution syntax.
+You can use ConfigMap-defined environment variables in the `command` and `args` of a container using the `$(VAR_NAME)` Kubernetes substitution syntax.
 
 For example, the following Pod specification
 
@@ -686,5 +689,4 @@ data:
 ## {{% heading "whatsnext" %}}
 
 * Follow a real world example of [Configuring Redis using a ConfigMap](/docs/tutorials/configuration/configure-redis-using-configmap/).
-
 

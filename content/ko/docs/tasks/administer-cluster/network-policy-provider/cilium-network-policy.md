@@ -48,7 +48,7 @@ Minikube에서 실리움의 데몬셋 구성과 적절한 RBAC 설정을 포함�
 간단한 ``올인원`` YAML 파일로 배포할 수 있다.
 
 ```shell
-kubectl create -f  https://raw.githubusercontent.com/cilium/cilium/v1.6/install/kubernetes/quick-install.yaml
+kubectl create -f  https://raw.githubusercontent.com/cilium/cilium/v1.8/install/kubernetes/quick-install.yaml
 ```
 ```
 configmap/cilium-config created
@@ -63,13 +63,13 @@ deployment.apps/cilium-operator created
 ```
 
 시작하기 안내서의 나머지 부분은 예제 애플리케이션을 이용하여
-L3/L4(예, IP 주소 + 포트) 모두의 보안 정책 뿐만 아니라 L7(예, HTTP)의 보안 정책을
+L3/L4(예, IP 주소 + 포트) 모두의 보안 정책뿐만 아니라 L7(예, HTTP)의 보안 정책을
 적용하는 방법을 설명한다.
 
 ## 실리움을 실 서비스 용도로 배포하기
 
 실리움을 실 서비스 용도의 배포에 관련한 자세한 방법은
-[실리움 쿠버네티스 설치 안내](https://docs.cilium.io/en/stable/kubernetes/intro/)를 살펴본다.
+[실리움 쿠버네티스 설치 안내](https://docs.cilium.io/en/stable/concepts/kubernetes/intro/)를 살펴본다.
 이 문서는 자세한 요구사항, 방법과
 실제 데몬셋 예시를 포함한다.
 
@@ -102,9 +102,6 @@ cilium-6rxbd    1/1     Running   0          1m
 
 클러스터가 동작하면,
 실리움으로 쿠버네티스 네트워크 폴리시를 시도하기 위해
-[네트워크 폴리시 선언하기](/docs/tasks/administer-cluster/declare-network-policy/)를 따라 할 수 있다.
+[네트워크 폴리시 선언하기](/ko/docs/tasks/administer-cluster/declare-network-policy/)를 따라 할 수 있다.
 재미있게 즐기고, 질문이 있다면
 [실리움 슬랙 채널](https://cilium.herokuapp.com/)을 이용하여 연락한다.
-
-
-

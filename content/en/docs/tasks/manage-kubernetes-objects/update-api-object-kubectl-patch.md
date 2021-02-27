@@ -229,7 +229,7 @@ The `kubectl patch` command has a `type` parameter that you can set to one of th
 </table>
 
 For a comparison of JSON patch and JSON merge patch, see
-[JSON Patch and JSON Merge Patch](http://erosb.github.io/post/json-patch-vs-merge-patch/).
+[JSON Patch and JSON Merge Patch](https://erosb.github.io/post/json-patch-vs-merge-patch/).
 
 The default value for the `type` parameter is `strategic`. So in the preceding exercise, you
 did a strategic merge patch.
@@ -445,6 +445,9 @@ and
 [kubectl apply](/docs/reference/generated/kubectl/kubectl-commands/#apply).
 
 
+{{< note >}}
+Strategic merge patch is not supported for custom resources.
+{{< /note >}}
 
 
 ## {{% heading "whatsnext" %}}

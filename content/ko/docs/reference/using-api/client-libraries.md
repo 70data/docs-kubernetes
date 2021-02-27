@@ -10,20 +10,20 @@ weight: 30
 
 
 <!-- body -->
-[쿠버네티스 REST API](/ko/docs/reference/using-api/api-overview/)를 사용해 애플리케이션을 작성하기 위해
+[쿠버네티스 REST API](/ko/docs/reference/using-api/)를 사용해 애플리케이션을 작성하기 위해
 API 호출 또는 요청/응답 타입을 직접 구현할 필요는 없다.
 사용하고 있는 프로그래밍 언어를 위한 클라이언트 라이브러리를 사용하면 된다.
 
 클라이언트 라이브러리는 대체로 인증과 같은 공통의 태스크를 처리한다.
 대부분의 클라이언트 라이브러리들은 API 클라이언트가 쿠버네티스 클러스터 내부에서 동작하는 경우 인증
-또는 [kubeconfig 파일](/docs/tasks/access-application-cluster/authenticate-across-clusters-kubeconfig/) 포맷을 통해
+또는 [kubeconfig 파일](/ko/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) 포맷을 통해
 자격증명과 API 서버 주소를 읽을 수 있게
 쿠버네티스 서비스 어카운트를 발견하고 사용할 수 있다.
 
 ## 공식적으로 지원되는 쿠버네티스 클라이언트 라이브러리
 
-다음의 클라이언트 라이브러리들은 [쿠버네티스 SIG API
-Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery)에서 공식적으로 관리된다.
+다음의 클라이언트 라이브러리들은
+[쿠버네티스 SIG API Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery)에서 공식적으로 관리된다.
 
 
 | 언어      | 클라이언트 라이브러리 | 예제 프로그램 |
@@ -38,6 +38,8 @@ Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery
 
 ## 커뮤니티에 의해 관리되는 클라이언트 라이브러리
 
+{{% thirdparty-content %}}
+
 다음의 쿠버네티스 API 클라이언트 라이브러리들은 쿠버네티스 팀이 아닌
 각각의 저자들이 제공하고 관리한다.
 
@@ -47,6 +49,7 @@ Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery
 | Go                   | [github.com/ericchiang/k8s](https://github.com/ericchiang/k8s) |
 | Java (OSGi)          | [bitbucket.org/amdatulabs/amdatu-kubernetes](https://bitbucket.org/amdatulabs/amdatu-kubernetes) |
 | Java (Fabric8, OSGi) | [github.com/fabric8io/kubernetes-client](https://github.com/fabric8io/kubernetes-client) |
+| Java                 | [github.com/manusa/yakc](https://github.com/manusa/yakc) |
 | Lisp                 | [github.com/brendandburns/cl-k8s](https://github.com/brendandburns/cl-k8s) |
 | Lisp                 | [github.com/xh4/cube](https://github.com/xh4/cube) |
 | Node.js (TypeScript) | [github.com/Goyoo/node-k8s-client](https://github.com/Goyoo/node-k8s-client) |
@@ -57,6 +60,7 @@ Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery
 | PHP                  | [github.com/allansun/kubernetes-php-client](https://github.com/allansun/kubernetes-php-client) |
 | PHP                  | [github.com/maclof/kubernetes-client](https://github.com/maclof/kubernetes-client) |
 | PHP                  | [github.com/travisghansen/kubernetes-client-php](https://github.com/travisghansen/kubernetes-client-php) |
+| PHP                  | [github.com/renoki-co/php-k8s](https://github.com/renoki-co/php-k8s) |
 | Python               | [github.com/eldarion-gondor/pykube](https://github.com/eldarion-gondor/pykube) |
 | Python               | [github.com/fiaas/k8s](https://github.com/fiaas/k8s) |
 | Python               | [github.com/mnubo/kubernetes-py](https://github.com/mnubo/kubernetes-py) |
@@ -69,9 +73,7 @@ Machinery](https://github.com/kubernetes/community/tree/master/sig-api-machinery
 | Scala                | [github.com/doriordan/skuber](https://github.com/doriordan/skuber) |
 | Scala                | [github.com/joan38/kubernetes-client](https://github.com/joan38/kubernetes-client) |
 | DotNet               | [github.com/tonnyeremin/kubernetes_gen](https://github.com/tonnyeremin/kubernetes_gen) |
+| Swift                | [github.com/swiftkube/client](https://github.com/swiftkube/client) |
 | DotNet (RestSharp)   | [github.com/masroorhasan/Kubernetes.DotNet](https://github.com/masroorhasan/Kubernetes.DotNet) |
 | Elixir               | [github.com/obmarg/kazan](https://github.com/obmarg/kazan/) |
 | Elixir               | [github.com/coryodaniel/k8s](https://github.com/coryodaniel/k8s) |
-
-
-

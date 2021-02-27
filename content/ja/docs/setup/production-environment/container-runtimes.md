@@ -18,14 +18,13 @@ Podのコンテナを実行するために、Kubernetesはコンテナランタ�
 悪意のあるコンテナがこの脆弱性を利用してruncのバイナリを上書きし、
 コンテナホストシステム上で任意のコマンドを実行する可能性があります。
 
-この問題の更なる情報は以下のリンクを参照してください。
-[cve-2019-5736 : runc vulnerability](https://access.redhat.com/security/cve/cve-2019-5736)
+この問題の更なる情報は[CVE-2019-5736](https://access.redhat.com/security/cve/cve-2019-5736)を参照してください。
 {{< /caution >}}
 
 ### 適用性
 
 {{< note >}}
-このドキュメントはLinuxにCRIをインストールするユーザーの為に書かれています。
+このドキュメントはLinuxにCRIをインストールするユーザーのために書かれています。
 他のオペレーティングシステムの場合、プラットフォーム固有のドキュメントを見つけてください。
 {{< /note >}}
 
@@ -47,39 +46,57 @@ systemdと一緒に `cgroupfs` を使用するということは、2つの異な
 kubeletとDockerに `cgroupfs` を使用し、ノード上で実行されている残りのプロセスに `systemd` を使用するように設定されたノードが、
 リソース圧迫下で不安定になる場合があります。
 
-あなたのコンテナランタイムとkubeletにcgroupドライバーとしてsystemdを使用するように設定を変更することはシステムを安定させました。
+コンテナランタイムとkubeletがcgroupドライバーとしてsystemdを使用するように設定を変更することでシステムは安定します。
 以下のDocker設定の `native.cgroupdriver=systemd` オプションに注意してください。
+
+{{< caution >}}
+すでにクラスターに組み込まれているノードのcgroupドライバーを変更することは非常におすすめしません。
+kubeletが一方のcgroupドライバーを使用してPodを作成した場合、コンテナランタイムを別のもう一方のcgroupドライバーに変更すると、そのような既存のPodのPodサンドボックスを再作成しようとするとエラーが発生する可能性があります。
+kubeletを再起動しても問題は解決しないでしょう。
+ワークロードからノードを縮退させ、クラスターから削除して再び組み込むことを推奨します。
+{{< /caution >}}
 
 ## Docker
 
 それぞれのマシンに対してDockerをインストールします。
-バージョン18.06.2が推奨されていますが、1.11、1.12、1.13、17.03、18.09についても動作が確認されています。
+バージョン19.03.11が推奨されていますが、1.13.1、17.03、17.06、17.09、18.06、18.09についても動作が確認されています。
 Kubernetesのリリースノートにある、Dockerの動作確認済み最新バージョンについてもご確認ください。
 
 システムへDockerをインストールするには、次のコマンドを実行します。
 
 {{< tabs name="tab-cri-docker-installation" >}}
-{{< tab name="Ubuntu 16.04" codelang="bash" >}}
-# Docker CEのインストール
+{{% tab name="Ubuntu 16.04+" %}}
+
+```shell
+# (Install Docker CE)
 ## リポジトリをセットアップ
-### aptパッケージインデックスを更新
-    apt-get update
-
 ### HTTPS越しのリポジトリの使用をaptに許可するために、パッケージをインストール
-    apt-get update && apt-get install apt-transport-https ca-certificates curl software-properties-common
+apt-get update && apt-get install -y \
+  apt-transport-https ca-certificates curl software-properties-common gnupg2
+```
 
-### Docker公式のGPG鍵を追加
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+```shell
+# Docker公式のGPG鍵を追加:
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+```
 
-### dockerのaptリポジトリを追加
-    add-apt-repository \
-    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) \
-    stable"
+```shell
+# Dockerのaptレポジトリを追加:
+add-apt-repository \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) \
+  stable"
+```
 
-## docker ceのインストール
-apt-get update && apt-get install docker-ce=18.06.2~ce~3-0~ubuntu
+```shell
+# Docker CEのインストール
+apt-get update && apt-get install -y \
+containerd.io=1.2.13-2 \
+docker-ce=5:19.03.11~3-0~ubuntu-$(lsb_release -cs) \
+docker-ce-cli=5:19.03.11~3-0~ubuntu-$(lsb_release -cs)
+```
 
+```shell
 # デーモンをセットアップ
 cat > /etc/docker/daemon.json <<EOF
 {
@@ -91,31 +108,47 @@ cat > /etc/docker/daemon.json <<EOF
   "storage-driver": "overlay2"
 }
 EOF
+```
 
+```shell
 mkdir -p /etc/systemd/system/docker.service.d
+```
 
+```shell
 # dockerを再起動
 systemctl daemon-reload
 systemctl restart docker
-{{< /tab >}}
-{{< tab name="CentOS/RHEL 7.4+" codelang="bash" >}}
+```
+{{% /tab %}}
+{{% tab name="CentOS/RHEL 7.4+" %}}
 
-# Docker CEのインストール
+```shell
+# (Docker CEのインストール)
 ## リポジトリをセットアップ
 ### 必要なパッケージのインストール
-    yum install yum-utils device-mapper-persistent-data lvm2
+yum install -y yum-utils device-mapper-persistent-data lvm2
+```
 
-### dockerパッケージ用のyumリポジトリを追加
-yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo
+```shell
+### Dockerリポジトリの追加
+yum-config-manager --add-repo \
+  https://download.docker.com/linux/centos/docker-ce.repo
+```
 
-## docker ceのインストール
-yum update && yum install docker-ce-18.06.2.ce
+```shell
+## Docker CEのインストール
+yum update -y && yum install -y \
+  containerd.io-1.2.13 \
+  docker-ce-19.03.11 \
+  docker-ce-cli-19.03.11
+```
 
+```shell
 ## /etc/docker ディレクトリを作成
 mkdir /etc/docker
+```
 
+```shell
 # デーモンをセットアップ
 cat > /etc/docker/daemon.json <<EOF
 {
@@ -130,14 +163,25 @@ cat > /etc/docker/daemon.json <<EOF
   ]
 }
 EOF
+```
 
+```shell
 mkdir -p /etc/systemd/system/docker.service.d
+```
 
+```shell
 # dockerを再起動
 systemctl daemon-reload
 systemctl restart docker
-{{< /tab >}}
+```
+{{% /tab %}}
 {{< /tabs >}}
+
+ブート時にDockerサービスを開始させたい場合は、以下のコマンドを入力してください:
+
+```shell
+sudo systemctl enable docker
+```
 
 詳細については、[Dockerの公式インストールガイド](https://docs.docker.com/engine/installation/)を参照してください。
 
@@ -147,7 +191,12 @@ systemctl restart docker
 
 システムへCRI-Oをインストールするためには以下のコマンドを利用します:
 
-### 必要な設定の追加
+{{< note >}}
+CRI-OのメジャーとマイナーバージョンはKubernetesのメジャーとマイナーバージョンと一致しなければなりません。
+詳細は[CRI-O互換性表](https://github.com/cri-o/cri-o)を参照してください。
+{{< /note >}}
+
+### 事前準備
 
 ```shell
 modprobe overlay
@@ -164,33 +213,79 @@ sysctl --system
 ```
 
 {{< tabs name="tab-cri-cri-o-installation" >}}
-{{< tab name="Ubuntu 16.04" codelang="bash" >}}
+{{% tab name="Debian" %}}
 
-# 必要なパッケージをインストールし、リポジトリを追加
-apt-get update
-apt-get install software-properties-common
+```shell
+# Debian Unstable/Sid
+echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_Unstable/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/Debian_Unstable/Release.key -O- | sudo apt-key add -
+```
 
-add-apt-repository ppa:projectatomic/ppa
-apt-get update
+```shell
+# Debian Testing
+echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_Testing/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/Debian_Testing/Release.key -O- | sudo apt-key add -
+```
+```shell
+# Debian 10
+echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/Debian_10/Release.key -O- | sudo apt-key add -
+```
 
-# CRI-Oをインストール
-apt-get install cri-o-1.11
+```shell
+# Raspbian 10
+echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Raspbian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/Raspbian_10/Release.key -O- | sudo apt-key add -
+```
 
-{{< /tab >}}
-{{< tab name="CentOS/RHEL 7.4+" codelang="bash" >}}
+それでは、CRI-Oをインストールします:
+```shell
+sudo apt-get install cri-o-1.17
+```
+{{% /tab %}}
 
-# 必要なリポジトリを追加
-yum-config-manager --add-repo=https://cbs.centos.org/repos/paas7-crio-311-candidate/x86_64/os/
+{{% tab name="Ubuntu 18.04, 19.04 and 19.10" %}}
 
-# CRI-Oをインストール
-yum install --nogpgcheck cri-o
+```shell
+# パッケージレポジトリを設定する
+. /etc/os-release
+sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x${NAME}_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
+wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key -O- | sudo apt-key add -
+sudo apt-get update
+```
 
-{{< /tab >}}
+```shell
+# CRI-Oのインストール
+sudo apt-get install cri-o-1.17
+```
+{{% /tab %}}
+
+{{% tab name="CentOS/RHEL 7.4+" %}}
+
+```shell
+# 必要なパッケージのインストール
+curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/CentOS_7/devel:kubic:libcontainers:stable.repo
+curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:{{< skew latestVersion >}}.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{< skew latestVersion >}}/CentOS_7/devel:kubic:libcontainers:stable:cri-o:{{< skew latestVersion >}}.repo
+```
+
+```shell
+# CRI-Oのインストール
+yum install -y cri-o
+```
+{{% /tab %}}
+
+{{% tab name="openSUSE Tumbleweed" %}}
+
+```shell
+sudo zypper install cri-o
+```
+{{% /tab %}}
 {{< /tabs >}}
 
 ### CRI-Oの起動
 
-```
+```shell
+systemctl daemon-reload
 systemctl start crio
 ```
 
@@ -205,6 +300,11 @@ systemctl start crio
 ### 必要な設定の追加
 
 ```shell
+cat > /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+
 modprobe overlay
 modprobe br_netfilter
 
@@ -218,36 +318,85 @@ EOF
 sysctl --system
 ```
 
-{{< tabs name="tab-cri-containerd-installation" >}}
-{{< tab name="Ubuntu 16.04+" codelang="bash" >}}
-apt-get install -y libseccomp2
-{{< /tab >}}
-{{< tab name="CentOS/RHEL 7.4+" codelang="bash" >}}
-yum install -y libseccomp
-{{< /tab >}}
-{{< /tabs >}}
-
 ### containerdのインストール
 
-[Containerdは定期的にリリース](https://github.com/containerd/containerd/releases)されますが、以下に示すコマンドで利用している値は、この手順が作成された時点での最新のバージョンにしたがって書かれています。より新しいバージョンとダウンロードするファイルのハッシュ値については[こちら](https://storage.googleapis.com/cri-containerd-release)で確認するようにしてください。
+{{< tabs name="tab-cri-containerd-installation" >}}
+{{< tab name="Ubuntu 16.04" codelang="bash" >}}
 
 ```shell
-# 必要な環境変数をexportします。
-export CONTAINERD_VERSION="1.1.2"
-export CONTAINERD_SHA256="d4ed54891e90a5d1a45e3e96464e2e8a4770cd380c21285ef5c9895c40549218"
-
-# containerdのtarボールをダウンロードします。
-wget https://storage.googleapis.com/cri-containerd-release/cri-containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz
-
-# ハッシュ値をチェックします。
-echo "${CONTAINERD_SHA256} cri-containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz" | sha256sum --check -
-
-# 解凍して展開します。
-tar --no-overwrite-dir -C / -xzf cri-containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz
-
-# containerdを起動します。
-systemctl start containerd
+# (containerdのインストール)
+## リポジトリの設定
+### HTTPS越しのリポジトリの使用をaptに許可するために、パッケージをインストール
+apt-get update && apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 ```
+
+```shell
+## Docker公式のGPG鍵を追加
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+```
+
+```
+## Dockerのaptリポジトリの追加
+add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+```
+
+```shell
+## containerdのインストール
+apt-get update && apt-get install -y containerd.io
+```
+
+```shell
+# containerdの設定
+mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+```
+
+```shell
+# containerdの再起動
+systemctl restart containerd
+```
+{{% /tab %}}
+{{% tab name="CentOS/RHEL 7.4+" %}}
+
+```shell
+# (containerdのインストール)
+## リポジトリの設定
+### 必要なパッケージのインストール
+yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+```shell
+## Dockerのリポジトリの追加
+yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+```shell
+## containerdのインストール
+yum update -y && yum install -y containerd.io
+```
+
+```shell
+## containerdの設定
+mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+```
+
+```shell
+# containerdの再起動
+systemctl restart containerd
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+### systemd
+
+`systemd`のcgroupドライバーを使うには、`/etc/containerd/config.toml`内で`plugins.cri.systemd_cgroup = true`を設定してください。
+kubeadmを使う場合は[kubeletのためのcgroupドライバー](/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#マスターノードのkubeletによって使用されるcgroupドライバーの設定)を手動で設定してください。
 
 ## その他のCRIランタイム: frakti
 

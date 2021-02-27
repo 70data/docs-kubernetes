@@ -8,7 +8,7 @@ weight: 40
 このページでは、Initコンテナについて概観します。Initコンテナとは、{{< glossary_tooltip text="Pod" term_id="pod" >}}内でアプリケーションコンテナの前に実行される特別なコンテナです。
 Initコンテナにはアプリケーションコンテナのイメージに存在しないセットアップスクリプトやユーティリティーを含めることができます。
 
-Initコンテナは、Podの仕様のうち`containers`という配列（これがアプリケーションコンテナを示します）と並べて指定します。
+Initコンテナは、Podの仕様のうち`containers`という配列(これがアプリケーションコンテナを示します)と並べて指定します。
 
 <!-- body -->
 ## Initコンテナを理解する {#understanding-init-containers}
@@ -29,7 +29,7 @@ Initコンテナのステータスは、`.status.initContainerStatuses`フィー
 
 Initコンテナは、リソースリミット、ボリューム、セキュリティ設定などのアプリケーションコンテナの全てのフィールドと機能をサポートしています。しかし、Initコンテナに対するリソースリクエストやリソースリミットの扱いは異なります。[リソース](#resources)にて説明します。
 
-また、InitコンテナはそのPodの準備ができる前に完了しなくてはならないため、`readinessProbe`をサポートしていません。
+また、InitコンテナはそのPodの準備ができる前に完了しなくてはならないため、`lifecycle`、`livenessProbe`、`readinessProbe`および`startupProbe`をサポートしていません。
 
 複数のInitコンテナを単一のPodに対して指定した場合、KubeletはそれらのInitコンテナを1つずつ順番に実行します。各Initコンテナは、次のInitコンテナが稼働する前に正常終了しなくてはなりません。全てのInitコンテナの実行が完了すると、KubeletはPodのアプリケーションコンテナを初期化し、通常通り実行します。
 
@@ -200,11 +200,11 @@ NAME        READY     STATUS    RESTARTS   AGE
 myapp-pod   1/1       Running   0          9m
 ```
 
-このシンプルな例を独自のInitコンテナを作成する際の参考にしてください。[次の項目](#what-s-next)にさらに詳細な使用例に関するリンクがあります。
+このシンプルな例を独自のInitコンテナを作成する際の参考にしてください。[次の項目](#whats-next)にさらに詳細な使用例に関するリンクがあります。
 
-## Initコンテナのふるまいに関する詳細 {#Detailed behavior}
+## Initコンテナのふるまいに関する詳細 {#detailed-behavior}
 
-Podの起動時において、各Initコンテナはネットワークとボリュームが初期化されたのちに順番に起動します。各Initコンテナは次のInitコンテナが起動する前に正常に終了しなくてはなりません。もしあるInitコンテナがランタイムもしくはエラーにより起動失敗した場合、そのPodの`restartPolicy`の値に従ってリトライされます。しかし、もしPodの`restartPolicy`が`Always`に設定されていた場合、Initコンテナの`restartPolicy`は`OnFailure`が適用されます。
+Podの起動時は各Initコンテナが起動状態となるまで、kubeletはネットワーキングおよびストレージを利用可能な状態にしません。また、kubeletはPodのspecに定義された順番に従ってPodのInitコンテナを起動します。各Initコンテナは次のInitコンテナが起動する前に正常に終了しなくてはなりません。もしあるInitコンテナがランタイムもしくはエラーにより起動失敗した場合、そのPodの`restartPolicy`の値に従ってリトライされます。しかし、もしPodの`restartPolicy`が`Always`に設定されていた場合、Initコンテナの`restartPolicy`は`OnFailure`が適用されます。
 
 Podは全てのInitコンテナが完了するまで`Ready`状態となりません。Initコンテナ上のポートはServiceによって集約されません。初期化中のPodのステータスは`Pending`となりますが、`Initialized`という値はtrueとなります。
 
@@ -213,7 +213,7 @@ Podは全てのInitコンテナが完了するまで`Ready`状態となりませ
 Initコンテナの仕様の変更は、コンテナイメージのフィールドのみに制限されています。
 Initコンテナのイメージフィールド値を変更すると、そのPodは再起動されます。
 
-Initコンテナは何度も再起動およびリトライ可能なため、べき等（Idempotent）である必要があります。特に、`EmptyDirs`にファイルを書き込むコードは、書き込み先のファイルがすでに存在している可能性を考慮に入れる必要があります。
+Initコンテナは何度も再起動およびリトライ可能なため、べき等(Idempotent)である必要があります。特に、`EmptyDirs`にファイルを書き込むコードは、書き込み先のファイルがすでに存在している可能性を考慮に入れる必要があります。
 
 Initコンテナはアプリケーションコンテナの全てのフィールドを持っています。しかしKubernetesは、Initコンテナが完了と異なる状態を定義できないため`readinessProbe`が使用されることを禁止しています。これはバリデーションの際に適用されます。
 
@@ -230,11 +230,11 @@ Initコンテナの順序と実行を考えるとき、リソースの使用に�
   * リソースに対する全てのアプリケーションコンテナのリクエスト／リミットの合計
   * リソースに対する有効なinitリクエスト／リミット
 * スケジューリングは有効なリクエスト／リミットに基づいて実行されます。つまり、InitコンテナはPodの生存中には使用されない初期化用のリソースを確保することができます。
-* Podの*有効なQos（quality of service）ティアー* は、Initコンテナとアプリケーションコンテナで同様です。
+* Podの*有効なQoS(quality of service)ティアー* は、Initコンテナとアプリケーションコンテナで同様です。
 
 クォータとリミットは有効なPodリクエストとリミットに基づいて適用されます。
 
-Podレベルのコントロールグループ（cgroups）は、スケジューラーと同様に、有効なPodリクエストとリミットに基づいています。
+Podレベルのコントロールグループ(cgroups)は、スケジューラーと同様に、有効なPodリクエストとリミットに基づいています。
 
 ### Podの再起動の理由 {#pod-restart-reasons}
 
@@ -249,5 +249,4 @@ Podレベルのコントロールグループ（cgroups）は、スケジュー�
 
 * [Initコンテナを含むPodの作成](/docs/tasks/configure-pod-container/configure-pod-initialization/#creating-a-pod-that-has-an-init-container)方法について学ぶ。
 * [Initコンテナのデバッグ](/ja/docs/tasks/debug-application-cluster/debug-init-containers/)を行う方法について学ぶ。
-
 

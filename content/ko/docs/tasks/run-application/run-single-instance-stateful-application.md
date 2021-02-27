@@ -1,37 +1,39 @@
 ---
 title: 단일 인스턴스 스테이트풀 애플리케이션 실행하기
-content_template: templates/tutorial
+content_type: tutorial
 weight: 20
 ---
 
-{{% capture overview %}}
+<!-- overview -->
 
 이 페이지에서는 쿠버네티스 클러스터에서 퍼시스턴트볼륨(PersistentVolume)과 디플로이먼트(Deployment)를 
 사용하여, 단일 인스턴스 스테이트풀 애플리케이션을 실행하는 방법을 보인다.
 해당 애플리케이션은 MySQL이다.
 
-{{% /capture %}}
 
 
-{{% capture objectives %}}
+
+## {{% heading "objectives" %}}
+
 
 * 사용자 환경의 디스크를 참조하는 퍼시스턴트볼륨 생성하기
 * MySQL 디플로이먼트 생성하기
 * 알려진 DNS 이름으로 클러스터의 다른 파드에 MySQL 서비스 노출하기
 
-{{% /capture %}}
 
 
-{{% capture prerequisites %}}
+
+## {{% heading "prerequisites" %}}
 
 * {{< include "task-tutorial-prereqs.md" >}} {{< version-check >}}
 
 * {{< include "default-storage-class-prereqs.md" >}}
 
-{{% /capture %}}
 
 
-{{% capture lessoncontent %}}
+
+
+<!-- lessoncontent -->
 
 ## MySQL 배포하기
 
@@ -45,7 +47,7 @@ MySQL을 실행하고 퍼시스턴트볼륨클레임을 참조하는 디플로�
 동적 프로비저너에 의해서 충족된다.
 
 참고: config yaml 파일에 정의된 비밀번호는 안전하지 않다. 더 안전한 해결방법을 위해 
-[쿠버네티스 시크릿](/docs/concepts/configuration/secret/)
+[쿠버네티스 시크릿](/ko/docs/concepts/configuration/secret/)
 을 보자
 
 {{< codenew file="application/mysql/mysql-deployment.yaml" >}}
@@ -180,10 +182,11 @@ kubectl delete pv mysql-pv-volume
 일부 동적 프로비저너(EBS 와 PD와 같은)는 
 퍼시스턴트볼륨을 삭제할 때에 기본 리소스도 해제한다.
 
-{{% /capture %}}
 
 
-{{% capture whatsnext %}}
+
+## {{% heading "whatsnext" %}}
+
 
 * [디플로이먼트 오브젝트](/ko/docs/concepts/workloads/controllers/deployment/)에 대해 더 배워 보기
 
@@ -193,4 +196,6 @@ kubectl delete pv mysql-pv-volume
 
 * [볼륨](/ko/docs/concepts/storage/volumes/)과 [퍼시스턴트 볼륨](/ko/docs/concepts/storage/persistent-volumes/)
 
-{{% /capture %}}
+
+
+

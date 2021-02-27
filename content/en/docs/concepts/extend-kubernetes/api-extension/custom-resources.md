@@ -13,12 +13,10 @@ weight: 10
 resource to your Kubernetes cluster and when to use a standalone service. It describes the two
 methods for adding custom resources and how to choose between them.
 
-
-
 <!-- body -->
 ## Custom resources
 
-A *resource* is an endpoint in the [Kubernetes API](/docs/reference/using-api/api-overview/) that stores a collection of
+A *resource* is an endpoint in the [Kubernetes API](/docs/concepts/overview/kubernetes-api/) that stores a collection of
 [API objects](/docs/concepts/overview/working-with-objects/kubernetes-objects/) of a certain kind; for example, the built-in *pods* resource contains a collection of Pod objects.
 
 A *custom resource* is an extension of the Kubernetes API that is not necessarily available in a default
@@ -28,12 +26,12 @@ many core Kubernetes functions are now built using custom resources, making Kube
 Custom resources can appear and disappear in a running cluster through dynamic registration,
 and cluster admins can update custom resources independently of the cluster itself.
 Once a custom resource is installed, users can create and access its objects using
-[kubectl](/docs/user-guide/kubectl-overview/), just as they do for built-in resources like
+[kubectl](/docs/reference/kubectl/overview/), just as they do for built-in resources like
 *Pods*.
 
 ## Custom controllers
 
-On their own, custom resources simply let you store and retrieve structured data.
+On their own, custom resources let you store and retrieve structured data.
 When you combine a custom resource with a *custom controller*, custom resources
 provide a true _declarative API_.
 
@@ -52,7 +50,9 @@ for specific applications into an extension of the Kubernetes API.
 
 ## Should I add a custom resource to my Kubernetes Cluster?
 
-When creating a new API, consider whether to [aggregate your API with the Kubernetes cluster APIs](/docs/concepts/api-extension/apiserver-aggregation/) or let your API stand alone.
+When creating a new API, consider whether to
+[aggregate your API with the Kubernetes cluster APIs](/docs/concepts/extend-kubernetes/api-extension/apiserver-aggregation/)
+or let your API stand alone.
 
 | Consider API aggregation if: | Prefer a stand-alone API if: |
 | ---------------------------- | ---------------------------- |
@@ -120,7 +120,7 @@ Kubernetes provides two ways to add custom resources to your cluster:
 
 Kubernetes provides these two options to meet the needs of different users, so that neither ease of use nor flexibility is compromised.
 
-Aggregated APIs are subordinate API servers that sit behind the primary API server, which acts as a proxy. This arrangement is called [API Aggregation](/docs/concepts/extend-kubernetes/api-extension/apiserver-aggregation/) (AA). To users, it simply appears that the Kubernetes API is extended.
+Aggregated APIs are subordinate API servers that sit behind the primary API server, which acts as a proxy. This arrangement is called [API Aggregation](/docs/concepts/extend-kubernetes/api-extension/apiserver-aggregation/) (AA). To users, the Kubernetes API appears extended.
 
 CRDs allow users to create new types of resources without adding another API server. You do not need to understand API Aggregation to use CRDs.
 

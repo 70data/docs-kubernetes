@@ -8,15 +8,9 @@ card:
 
 <!-- overview -->
 
-참고 항목: [Kubectl 개요](/ko/docs/reference/kubectl/overview/)와 [JsonPath 가이드](/docs/reference/kubectl/jsonpath).
-
-이 페이지는 `kubectl` 커맨드의 개요이다.
-
-
+이 페이지는 일반적으로 사용하는 `kubectl` 커맨드와 플래그에 대한 목록을 포함한다.
 
 <!-- body -->
-
-# kubectl - 치트 시트
 
 ## Kubectl 자동 완성
 
@@ -77,7 +71,8 @@ kubectl config set-context gce --user=cluster-admin --namespace=foo \
 kubectl config unset users.foo                       # foo 사용자 삭제
 ```
 
-## Apply
+## Kubectl apply
+
 `apply`는 쿠버네티스 리소스를 정의하는 파일을 통해 애플리케이션을 관리한다. `kubectl apply`를 실행하여 클러스터에 리소스를 생성하고 업데이트한다. 이것은 프로덕션 환경에서 쿠버네티스 애플리케이션을 관리할 때 권장된다. [Kubectl Book](https://kubectl.docs.kubernetes.io)을 참고한다.
 
 ## 오브젝트 생성
@@ -91,6 +86,13 @@ kubectl apply -f ./my1.yaml -f ./my2.yaml      # 여러 파일로 부터 생성
 kubectl apply -f ./dir                         # dir 내 모든 매니페스트 파일에서 리소스(들) 생성
 kubectl apply -f https://git.io/vPieo          # url로부터 리소스(들) 생성
 kubectl create deployment nginx --image=nginx  # nginx 단일 인스턴스를 시작
+
+# "Hello World"를 출력하는 잡(Job) 생성
+kubectl create job hello --image=busybox -- echo "Hello World"
+
+# 매분마다 "Hello World"를 출력하는 크론잡(CronJob) 생성
+kubectl create cronjob hello --image=busybox   --schedule="*/1 * * * *" -- echo "Hello World"    
+
 kubectl explain pods                           # 파드 매니페스트 문서를 조회
 
 # stdin으로 다수의 YAML 오브젝트 생성
@@ -162,6 +164,10 @@ kubectl get pv --sort-by=.spec.capacity.storage
 kubectl get pods --selector=app=cassandra -o \
   jsonpath='{.items[*].metadata.labels.version}'
 
+# 예를 들어 'ca.crt'와 같이 점이 있는 키값을 검색한다
+kubectl get configmap myconfig \
+  -o jsonpath='{.data.ca\.crt}'
+
 # 모든 워커 노드 조회 (셀렉터를 사용하여 'node-role.kubernetes.io/master'
 # 으로 명명된 라벨의 결과를 제외)
 kubectl get node --selector='!node-role.kubernetes.io/master'
@@ -184,6 +190,9 @@ kubectl get pods --show-labels
 JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' \
  && kubectl get nodes -o jsonpath="$JSONPATH" | grep "Ready=True"
 
+# 외부 도구 없이 디코딩된 시크릿 출력
+kubectl get secret ${secret_name} -o go-template='{{range $k,$v := .data}}{{$k}}={{$v|base64decode}}{{"\n"}}{{end}}'
+
 # 파드에 의해 현재 사용되고 있는 모든 시크릿 목록 조회
 kubectl get pods -o json | jq '.items[].spec.containers[].env[]?.valueFrom.secretKeyRef.name' | grep -v null | sort | uniq
 
@@ -196,6 +205,13 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 # 매니페스트가 적용된 경우 클러스터의 현재 상태와 클러스터의 상태를 비교한다.
 kubectl diff -f ./my-manifest.yaml
+
+# 노드에 대해 반환된 모든 키의 마침표로 구분된 트리를 생성한다.
+# 복잡한 중첩 JSON 구조 내에서 키를 찾을 때 유용하다.
+kubectl get nodes -o json | jq -c 'path(..)|[.[]|tostring]|join(".")'
+
+# 파드 등에 대해 반환된 모든 키의 마침표로 구분된 트리를 생성한다.
+kubectl get pods -o json | jq -c 'path(..)|[.[]|tostring]|join(".")'
 ```
 
 ## 리소스 업데이트
@@ -245,6 +261,7 @@ kubectl patch sa default --type='json' -p='[{"op": "add", "path": "/secrets/1", 
 ```
 
 ## 리소스 편집
+
 편집기로 모든 API 리소스를 편집.
 
 ```bash
@@ -255,7 +272,7 @@ KUBE_EDITOR="nano" kubectl edit svc/docker-registry   # 다른 편집기 사용
 ## 리소스 스케일링
 
 ```bash
-kubectl scale --replicas=3 rs/foo                                 # 'foo'라는 레플리카 셋을 3으로 스케일
+kubectl scale --replicas=3 rs/foo                                 # 'foo'라는 레플리카셋을 3으로 스케일
 kubectl scale --replicas=3 -f foo.yaml                            # "foo.yaml"에 지정된 리소스의 크기를 3으로 스케일
 kubectl scale --current-replicas=2 --replicas=3 deployment/mysql  # mysql이라는 디플로이먼트의 현재 크기가 2인 경우, mysql을 3으로 스케일
 kubectl scale --replicas=5 rc/foo rc/bar rc/baz                   # 여러 개의 레플리케이션 컨트롤러 스케일
@@ -286,11 +303,18 @@ kubectl logs -f my-pod                              # 실시간 스트림 파드
 kubectl logs -f my-pod -c my-container              # 실시간 스트림 파드 로그(stdout, 멀티-컨테이너 경우)
 kubectl logs -f -l name=myLabel --all-containers    # name이 myLabel인 모든 파드의 로그 스트리밍 (stdout)
 kubectl run -i --tty busybox --image=busybox -- sh  # 대화형 셸로 파드를 실행
-kubectl attach my-pod -i                            # 실행중인 컨테이너에 연결
+kubectl run nginx --image=nginx -n
+mynamespace                                         # 특정 네임스페이스에서 nginx 파드 실행
+kubectl run nginx --image=nginx                     # nginx 파드를 실행하고 해당 스펙을 pod.yaml 파일에 기록
+--dry-run=client -o yaml > pod.yaml
+
+kubectl attach my-pod -i                            # 실행 중인 컨테이너에 연결
 kubectl port-forward my-pod 5000:6000               # 로컬 머신의 5000번 포트를 리스닝하고, my-pod의 6000번 포트로 전달
 kubectl exec my-pod -- ls /                         # 기존 파드에서 명령 실행(한 개 컨테이너 경우)
+kubectl exec --stdin --tty my-pod -- /bin/sh        # 실행 중인 파드로 대화형 셸 액세스(1 컨테이너 경우)
 kubectl exec my-pod -c my-container -- ls /         # 기존 파드에서 명령 실행(멀티-컨테이너 경우)
 kubectl top pod POD_NAME --containers               # 특정 파드와 해당 컨테이너에 대한 메트릭 표시
+kubectl top pod POD_NAME --sort-by=cpu              # 지정한 파드에 대한 메트릭을 표시하고 'cpu' 또는 'memory'별로 정렬
 ```
 
 ## 노드, 클러스터와 상호 작용
@@ -310,7 +334,7 @@ kubectl taint nodes foo dedicated=special-user:NoSchedule
 
 ### 리소스 타입
 
-단축명, [API 그룹](/ko/docs/concepts/overview/kubernetes-api/#api-groups)과 함께 지원되는 모든 리소스 유형들, 그것들의 [네임스페이스](/ko/docs/concepts/overview/working-with-objects/namespaces)와 [종류(Kind)](/ko/docs/concepts/overview/working-with-objects/kubernetes-objects)를 나열:
+단축명, [API 그룹](/ko/docs/concepts/overview/kubernetes-api/#api-그룹)과 함께 지원되는 모든 리소스 유형들, 그것들의 [네임스페이스](/ko/docs/concepts/overview/working-with-objects/namespaces)와 [종류(Kind)](/ko/docs/concepts/overview/working-with-objects/kubernetes-objects)를 나열:
 
 ```bash
 kubectl api-resources
@@ -336,8 +360,8 @@ kubectl api-resources --api-group=extensions # "extensions" API 그룹의 모든
 `-o=custom-columns=<명세>` | 쉼표로 구분된 사용자 정의 열 목록을 사용하여 테이블 출력
 `-o=custom-columns-file=<파일명>` | `<파일명>`파일에서 사용자 정의 열 템플릿을 사용하여 테이블 출력
 `-o=json`     | JSON 형식의 API 오브젝트 출력
-`-o=jsonpath=<템플릿>` | [jsonpath](/docs/reference/kubectl/jsonpath) 표현식에 정의된 필드 출력
-`-o=jsonpath-file=<파일명>` | <파일명> 파일에서 [jsonpath](/docs/reference/kubectl/jsonpath) 표현식에 정의된 필드 출력
+`-o=jsonpath=<템플릿>` | [jsonpath](/ko/docs/reference/kubectl/jsonpath) 표현식에 정의된 필드 출력
+`-o=jsonpath-file=<파일명>` | <파일명> 파일에서 [jsonpath](/ko/docs/reference/kubectl/jsonpath) 표현식에 정의된 필드 출력
 `-o=name`     | 리소스 명만 출력하고 그 외에는 출력하지 않음
 `-o=wide`     | 추가 정보가 포함된 일반-텍스트 형식으로 출력하고, 파드의 경우 노드 명이 포함
 `-o=yaml`     | YAML 형식의 API 오브젝트 출력
@@ -368,22 +392,18 @@ Kubectl 로그 상세 레벨(verbosity)은 `-v` 또는`--v` 플래그와 로그 
 `--v=2` | 서비스와 시스템의 중요한 변화와 관련이있는 중요한 로그 메시지에 대한 유용한 정상 상태 정보. 이는 대부분의 시스템에서 권장되는 기본 로그 수준이다.
 `--v=3` | 변경 사항에 대한 확장 정보.
 `--v=4` | 디버그 수준 상세화.
+`--v=5` | 트레이스 수준 상세화.
 `--v=6` | 요청한 리소스를 표시.
 `--v=7` | HTTP 요청 헤더를 표시.
 `--v=8` | HTTP 요청 내용을 표시.
 `--v=9` | 내용을 잘라 내지 않고 HTTP 요청 내용을 표시.
 
-
-
 ## {{% heading "whatsnext" %}}
 
+* [kubectl 개요](/ko/docs/reference/kubectl/overview/)를 읽고 [JsonPath](/ko/docs/reference/kubectl/jsonpath)에 대해 배워보자.
 
-* [kubectl 개요](/ko/docs/reference/kubectl/overview/)에 대해 더 배워보자.
+* [kubectl](/ko/docs/reference/kubectl/kubectl/) 옵션을 참고한다.
 
-* [kubectl](/docs/reference/kubectl/kubectl/) 옵션을 참고한다.
+* 재사용 스크립트에서 kubectl 사용 방법을 이해하기 위해 [kubectl 사용법](/ko/docs/reference/kubectl/conventions/)을 참고한다.
 
-* 재사용 스크립트에서 kubectl 사용 방법을 이해하기 위해 [kubectl 사용법](/docs/reference/kubectl/conventions/)을 참고한다.
-
-* 더 많은 [kubectl 치트 시트](https://github.com/dennyzhang/cheatsheet-kubernetes-A4) 커뮤니티 확인
-
-
+* 더 많은 커뮤니티 [kubectl 치트시트](https://github.com/dennyzhang/cheatsheet-kubernetes-A4)를 확인한다.

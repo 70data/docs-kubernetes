@@ -32,15 +32,15 @@ You add a taint to a node using [kubectl taint](/docs/reference/generated/kubect
 For example,
 
 ```shell
-kubectl taint nodes node1 key=value:NoSchedule
+kubectl taint nodes node1 key1=value1:NoSchedule
 ```
 
-places a taint on node `node1`. The taint has key `key`, value `value`, and taint effect `NoSchedule`.
+places a taint on node `node1`. The taint has key `key1`, value `value1`, and taint effect `NoSchedule`.
 This means that no pod will be able to schedule onto `node1` unless it has a matching toleration.
 
 To remove the taint added by the command above, you can run:
 ```shell
-kubectl taint nodes node1 key:NoSchedule-
+kubectl taint nodes node1 key1=value1:NoSchedule-
 ```
 
 You specify a toleration for a pod in the PodSpec. Both of the following tolerations "match" the
@@ -49,20 +49,20 @@ to schedule onto `node1`:
 
 ```yaml
 tolerations:
-- key: "key"
+- key: "key1"
   operator: "Equal"
-  value: "value"
+  value: "value1"
   effect: "NoSchedule"
 ```
 
 ```yaml
 tolerations:
-- key: "key"
+- key: "key1"
   operator: "Exists"
   effect: "NoSchedule"
 ```
 
-Here’s an example of a pod that uses tolerations:
+Here's an example of a pod that uses tolerations:
 
 {{< codenew file="pods/pod-with-toleration.yaml" >}}
 
@@ -80,7 +80,7 @@ There are two special cases:
 An empty `key` with operator `Exists` matches all keys, values and effects which means this
 will tolerate everything.
 
-An empty `effect` matches all effects with key `key`.
+An empty `effect` matches all effects with key `key1`.
 
 {{< /note >}}
 
@@ -175,7 +175,7 @@ toleration to pods that use the special hardware. As in the dedicated nodes use 
 it is probably easiest to apply the tolerations using a custom
 [admission controller](/docs/reference/access-authn-authz/admission-controllers/).
 For example, it is recommended to use [Extended
-Resources](/docs/concepts/configuration/manage-compute-resources-container/#extended-resources)
+Resources](/docs/concepts/configuration/manage-resources-containers/#extended-resources)
 to represent the special hardware, taint your special hardware nodes with the
 extended resource name and run the
 [ExtendedResourceToleration](/docs/reference/access-authn-authz/admission-controllers/#extendedresourcetoleration)

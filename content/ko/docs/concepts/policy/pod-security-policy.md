@@ -1,7 +1,10 @@
 ---
+
+
+
 title: 파드 시큐리티 폴리시
 content_type: concept
-weight: 20
+weight: 30
 ---
 
 <!-- overview -->
@@ -10,9 +13,6 @@ weight: 20
 
 파드 시큐리티 폴리시를 사용하면 파드 생성 및 업데이트에 대한 세분화된 권한을
 부여할 수 있다.
-
-
-
 
 <!-- body -->
 
@@ -31,7 +31,7 @@ _Pod Security Policy_ 는 파드 명세의 보안 관련 측면을 제어하는 
 | 호스트 네트워킹과 포트의 사용                               | [`hostNetwork`, `hostPorts`](#호스트-네임스페이스) |
 | 볼륨 유형의 사용                                        | [`volumes`](#볼륨-및-파일시스템)      |
 | 호스트 파일시스템의 사용                                  | [`allowedHostPaths`](#볼륨-및-파일시스템) |
-| FlexVolume 드라이버의 화이트리스트                         | [`allowedFlexVolumes`](#flexvolume-드라이버) |
+| 특정 FlexVolume 드라이버의 허용                         | [`allowedFlexVolumes`](#flexvolume-드라이버) |
 | 파드 볼륨을 소유한 FSGroup 할당                           | [`fsGroup`](#볼륨-및-파일시스템)      |
 | 읽기 전용 루트 파일시스템 사용 필요                          | [`readOnlyRootFilesystem`](#볼륨-및-파일시스템) |
 | 컨테이너의 사용자 및 그룹 ID                               | [`runAsUser`, `runAsGroup`, `supplementalGroups`](#사용자-및-그룹) |
@@ -140,13 +140,17 @@ RBAC 바인딩에 대한 자세한 예는,
 
 ### 문제 해결
 
-- [컨트롤러 관리자](/docs/admin/kube-controller-manager/)는
-[보안 API 포트](/docs/reference/access-authn-authz/controlling-access/)에 대해 실행해야 하며,
-슈퍼유저 권한이 없어야 한다. 그렇지 않으면 요청이 인증 및 권한 부여 모듈을 우회하고,
-모든 파드시큐리티폴리시 오브젝트가 허용되며
-사용자는 특권있는 컨테이너를 만들 수 있다. 컨트롤러 관리자 권한 구성에 대한 자세한
-내용은 [컨트롤러 역할](/docs/reference/access-authn-authz/rbac/#controller-roles)을
-참고하길 바란다.
+- [컨트롤러 관리자](/docs/reference/command-line-tools-reference/kube-controller-manager/)는
+보안 API 포트에 대해 실행되어야 하며 수퍼유저 권한이 없어야 한다.
+API 서버 접근 제어에 대한 자세한 내용은
+[쿠버네티스 API에 대한 접근 제어](/ko/docs/concepts/security/controlling-access)를 참고하길 바란다.
+컨트롤러 관리자가 신뢰할 수 있는 API 포트(`localhost` 리스너라고도 함)를
+통해 연결된 경우, 요청이 인증 및 권한 부여 모듈을 우회하고,
+모든 파드시큐리티폴리시 오브젝트가 허용되며 사용자는 특권을 가진 컨테이너를
+만들 수 있는 권한을 부여할 수 있다.
+
+컨트롤러 관리자 권한 구성에 대한 자세한 내용은
+[컨트롤러 역할](/docs/reference/access-authn-authz/rbac/#controller-roles)을 참고하기 바란다.
 
 ## 정책 순서
 
@@ -212,12 +216,17 @@ kubectl-user create -f- <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
-  name:      pause
+  name: pause
 spec:
   containers:
-    - name:  pause
+    - name: pause
       image: k8s.gcr.io/pause
 EOF
+```
+
+이것의 출력은 다음과 같을 것이다.
+
+```
 Error from server (Forbidden): error when creating "STDIN": pods "pause" is forbidden: unable to validate against any pod security policy: []
 ```
 
@@ -260,12 +269,17 @@ kubectl-user create -f- <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
-  name:      pause
+  name: pause
 spec:
   containers:
-    - name:  pause
+    - name: pause
       image: k8s.gcr.io/pause
 EOF
+```
+
+이것의 출력은 다음과 같을 것이다.
+
+```
 pod "pause" created
 ```
 
@@ -277,14 +291,19 @@ kubectl-user create -f- <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
-  name:      privileged
+  name: privileged
 spec:
   containers:
-    - name:  pause
+    - name: pause
       image: k8s.gcr.io/pause
       securityContext:
         privileged: true
 EOF
+```
+
+이것의 출력은 다음과 같을 것이다.
+
+```
 Error from server (Forbidden): error when creating "STDIN": pods "privileged" is forbidden: unable to validate against any pod security policy: [spec.containers[0].securityContext.privileged: Invalid value: true: Privileged containers are not allowed]
 ```
 
@@ -299,7 +318,7 @@ kubectl-user delete pod pause
 약간 다르게 다시 시도해보자.
 
 ```shell
-kubectl-user run pause --image=k8s.gcr.io/pause
+kubectl-user create deployment pause --image=k8s.gcr.io/pause
 deployment "pause" created
 
 kubectl-user get pods
@@ -398,13 +417,13 @@ podsecuritypolicy "example" deleted
 동일한 노드에 있는 다른 파드의 네트워크 활동을 스누핑(snoop)하는 데
 사용할 수 있다.
 
-**HostPorts** - 호스트 네트워크 네임스페이스에 허용되는 포트 범위의 화이트리스트(whitelist)를
+**HostPorts** - 호스트 네트워크 네임스페이스에 허용되는 포트 범위의 목록을
 제공한다. `min`과 `max`를 포함하여 `HostPortRange`의 목록으로 정의된다.
 기본값은 허용하는 호스트 포트 없음(no allowed host ports)이다.
 
 ### 볼륨 및 파일시스템
 
-**Volumes** - 허용되는 볼륨 유형의 화이트리스트를 제공한다. 허용 가능한 값은
+**Volumes** - 허용되는 볼륨 유형의 목록을 제공한다. 허용 가능한 값은
 볼륨을 생성할 때 정의된 볼륨 소스에 따른다. 볼륨 유형의 전체 목록은
 [볼륨 유형들](/ko/docs/concepts/storage/volumes/#볼륨-유형들)에서 참고한다.
 또한 `*`를 사용하여 모든 볼륨 유형을
@@ -435,7 +454,7 @@ podsecuritypolicy "example" deleted
 유효성을 검사한다.
 - *RunAsAny* - 기본값은 제공되지 않는다. 어떠한 `fsGroup` ID의 지정도 허용한다.
 
-**AllowedHostPaths** - hostPath 볼륨에서 사용할 수 있는 호스트 경로의 화이트리스트를
+**AllowedHostPaths** - hostPath 볼륨에서 사용할 수 있는 호스트 경로의 목록을
 지정한다. 빈 목록은 사용되는 호스트 경로에 제한이 없음을 의미한다.
 이는 단일 `pathPrefix` 필드가 있는 오브젝트 목록으로 정의되며, hostPath 볼륨은
 허용된 접두사로 시작하는 경로를 마운트할 수 있으며 `readOnly` 필드는
@@ -455,7 +474,7 @@ allowedHostPaths:
 (다른 컨테이너들에 있는 데이터를 읽고, 시스템 서비스의 자격 증명을 어뷰징(abusing)하는 등)할
 수 있도록 만드는 다양한 방법이 있다. 예를 들면, Kubelet과 같다.
 
-쓰기 가능한 hostPath 디렉토리 볼륨을 사용하면, 컨테이너가 `pathPrefix` 외부의
+쓰기 가능한 hostPath 디렉터리 볼륨을 사용하면, 컨테이너가 `pathPrefix` 외부의
 호스트 파일시스템에 대한 통행을 허용하는 방식으로 컨테이너의 파일시스템 쓰기(write)를 허용한다.
 쿠버네티스 1.11 이상 버전에서 사용 가능한 `readOnly: true`는 지정된 `pathPrefix`에 대한
 접근을 효과적으로 제한하기 위해 **모든** `allowedHostPaths`에서 사용해야 한다.
@@ -466,7 +485,7 @@ allowedHostPaths:
 
 ### FlexVolume 드라이버
 
-flexvolume에서 사용할 수 있는 FlexVolume 드라이버의 화이트리스트를 지정한다.
+flexvolume에서 사용할 수 있는 FlexVolume 드라이버의 목록을 지정한다.
 빈 목록 또는 nil은 드라이버에 제한이 없음을 의미한다.
 [`volumes`](#볼륨-및-파일시스템) 필드에 `flexVolume` 볼륨 유형이 포함되어
 있는지 확인한다. 그렇지 않으면 FlexVolume 드라이버가 허용되지 않는다.
@@ -552,7 +571,7 @@ spec:
 다음 필드는 대문자로 표기된 기능 이름 목록을
 `CAP_` 접두사 없이 가져온다.
 
-**AllowedCapabilities** - 컨테이너에 추가될 수 있는 기능의 화이트리스트를
+**AllowedCapabilities** - 컨테이너에 추가될 수 있는 기능의 목록을
 제공한다. 기본적인 기능 셋은 암시적으로 허용된다. 비어있는 셋은
 기본 셋을 넘어서는 추가 기능이 추가되지 않는 것을
 의미한다. `*`는 모든 기능을 허용하는 데 사용할 수 있다.
@@ -576,7 +595,7 @@ spec:
 
 ### AllowedProcMountTypes
 
-`allowedProcMountTypes`는 허용된 ProcMountTypes의 화이트리스트이다.
+`allowedProcMountTypes`는 허용된 ProcMountTypes의 목록이다.
 비어 있거나 nil은 `DefaultProcMountType`만 사용할 수 있음을 나타낸다.
 
 `DefaultProcMount`는 /proc의 읽기 전용 및 마스킹(masking)된 경로에 컨테이너 런타임
@@ -592,12 +611,15 @@ spec:
 ### AppArmor
 
 파드시큐리티폴리시의 어노테이션을 통해 제어된다. [AppArmor
-문서](/docs/tutorials/clusters/apparmor/#podsecuritypolicy-annotations)를 참고하길 바란다.
+문서](/ko/docs/tutorials/clusters/apparmor/#podsecuritypolicy-annotations)를 참고하길 바란다.
 
 ### Seccomp
 
-파드에서 seccomp 프로파일의 사용은 파드시큐리티폴리시의 어노테이션을 통해
-제어할 수 있다. Seccomp는 쿠버네티스의 알파 기능이다.
+쿠버네티스 v1.19부터 파드나 컨테이너의 `securityContext` 에서
+`seccompProfile` 필드를 사용하여 [seccomp 프로파일 사용을
+제어](/docs/tutorials/clusters/seccomp)할 수 있다. 이전 버전에서는, 파드에
+어노테이션을 추가하여 seccomp를 제어했다. 두 버전에서 동일한 파드시큐리티폴리시를 사용하여
+이러한 필드나 어노테이션이 적용되는 방식을 적용할 수 있다.
 
 **seccomp.security.alpha.kubernetes.io/defaultProfileName** - 컨테이너에
 적용할 기본 seccomp 프로파일을 지정하는 어노테이션이다. 가능한 값은
@@ -610,7 +632,14 @@ spec:
   되었다. 대신 `runtime/default` 사용을 권장한다.
 - `localhost/<path>` - `<seccomp_root>/<path>`에 있는 노드에서 파일을 프로파일로
   지정한다. 여기서 `<seccomp_root>`는 Kubelet의 `--seccomp-profile-root` 플래그를
-  통해 정의된다.
+  통해 정의된다. `--seccomp-profile-root` 플래그가
+  정의되어 있지 않으면, `<root-dir>` 이 `--root-dir` 플래그로
+  지정된 `<root-dir>/seccomp` 기본 경로가 사용된다.
+
+{{< note >}}
+  `--seccomp-profile-root` 플래그는 쿠버네티스 v1.19부터 더 이상 사용되지
+  않는다. 사용자는 기본 경로를 사용하는 것이 좋다.
+{{< /note >}}
 
 **seccomp.security.alpha.kubernetes.io/allowedProfileNames** - 파드 seccomp
 어노테이션에 허용되는 값을 지정하는 어노테이션. 쉼표로 구분된
@@ -626,15 +655,9 @@ spec:
 - `allowedUnsafeSysctls` - `forbiddenSysctls`에 나열되지 않는 한 기본 목록에서 허용하지 않은 특정 sysctls를 허용한다.
 
 [Sysctl 문서](
-/docs/concepts/cluster-administration/sysctl-cluster/#podsecuritypolicy)를 참고하길 바란다.
-
-
+/docs/tasks/administer-cluster/sysctl-cluster/#podsecuritypolicy)를 참고하길 바란다.
 
 ## {{% heading "whatsnext" %}}
 
-
-폴리시 권장 사항에 대해서는 [파드 보안 표준](/docs/concepts/security/pod-security-standards/)을 참조한다.
-
-API 세부 정보는 [파드 시큐리티 폴리시 레퍼런스](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#podsecuritypolicy-v1beta1-policy) 참조한다.
-
-
+- 폴리시 권장 사항에 대해서는 [파드 보안 표준](/docs/concepts/security/pod-security-standards/)을 참조한다.
+- API 세부 정보는 [파드 시큐리티 폴리시 레퍼런스](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#podsecuritypolicy-v1beta1-policy) 참조한다.

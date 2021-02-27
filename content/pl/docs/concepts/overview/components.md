@@ -1,6 +1,9 @@
 ---
-title: Składniki Kubernetes
+title: Składniki Kubernetesa
 content_type: concept
+description: >
+  Klaster Kubernetesa tworzą: komponenty warstwy sterowania
+  oraz zbiór maszyn nazywanych węzłami.
 weight: 20
 card: 
   name: concepts
@@ -8,7 +11,7 @@ card:
 ---
 
 <!-- overview -->
-W wyniku instalacji Kubernetes otrzymujesz klaster.
+W wyniku instalacji Kubernetesa otrzymujesz klaster.
 
 {{< glossary_definition term_id="cluster" length="all" prepend="Klaster Kubernetes to">}}
 
@@ -16,7 +19,7 @@ W tym dokumencie opisujemy składniki niezbędne do zbudowania kompletnego, popr
 
 Poniższy rysunek przedstawia klaster Kubernetes i powiązania pomiędzy jego różnymi częściami składowymi.
 
-![Składniki Kubernetes](/images/docs/components-of-kubernetes.png)
+![Składniki Kubernetes](/images/docs/components-of-kubernetes.svg)
 
 
 <!-- body -->

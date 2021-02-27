@@ -22,7 +22,7 @@ allocated as much CPU as it requests.
 Your cluster must have at least 1 CPU available for use to run the task examples.
 
 A few of the steps on this page require you to run the
-[metrics-server](https://github.com/kubernetes-incubator/metrics-server)
+[metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 service in your cluster. If you have the metrics-server
 running, you can skip those steps.
 
@@ -222,6 +222,13 @@ Container is automatically assigned the default limit. Cluster administrators ca
 [LimitRange](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#limitrange-v1-core/)
 to specify a default value for the CPU limit.
 
+## If you specify a CPU limit but do not specify a CPU request
+
+If you specify a CPU limit for a Container but do not specify a CPU request, Kubernetes automatically
+assigns a CPU request that matches the limit. Similarly, if a Container specifies its own memory limit,
+but does not specify a memory request, Kubernetes automatically assigns a memory request that matches
+the limit.
+
 ## Motivation for CPU requests and limits
 
 By configuring the CPU requests and limits of the Containers that run in your
@@ -254,17 +261,17 @@ kubectl delete namespace cpu-example
 
 ### For cluster administrators
 
-* [Configure Default Memory Requests and Limits for a Namespace](/docs/tasks/administer-cluster/memory-default-namespace/)
+* [Configure Default Memory Requests and Limits for a Namespace](/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/)
 
-* [Configure Default CPU Requests and Limits for a Namespace](/docs/tasks/administer-cluster/cpu-default-namespace/)
+* [Configure Default CPU Requests and Limits for a Namespace](/docs/tasks/administer-cluster/manage-resources/cpu-default-namespace/)
 
-* [Configure Minimum and Maximum Memory Constraints for a Namespace](/docs/tasks/administer-cluster/memory-constraint-namespace/)
+* [Configure Minimum and Maximum Memory Constraints for a Namespace](/docs/tasks/administer-cluster/manage-resources/memory-constraint-namespace/)
 
-* [Configure Minimum and Maximum CPU Constraints for a Namespace](/docs/tasks/administer-cluster/cpu-constraint-namespace/)
+* [Configure Minimum and Maximum CPU Constraints for a Namespace](/docs/tasks/administer-cluster/manage-resources/cpu-constraint-namespace/)
 
-* [Configure Memory and CPU Quotas for a Namespace](/docs/tasks/administer-cluster/quota-memory-cpu-namespace/)
+* [Configure Memory and CPU Quotas for a Namespace](/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/)
 
-* [Configure a Pod Quota for a Namespace](/docs/tasks/administer-cluster/quota-pod-namespace/)
+* [Configure a Pod Quota for a Namespace](/docs/tasks/administer-cluster/manage-resources/quota-pod-namespace/)
 
 * [Configure Quotas for API Objects](/docs/tasks/administer-cluster/quota-api-object/)
 

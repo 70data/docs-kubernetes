@@ -1,8 +1,8 @@
 ---
-title: 证书
+title: 证书（Certificate）
 id: certificate
 date: 2018-04-12
-full_link: /docs/tasks/tls/managing-tls-in-a-cluster/
+full_link: /zh/docs/tasks/tls/managing-tls-in-a-cluster/
 short_description: >
   证书是个安全加密文件，用来确认对 Kubernetes 集群访问的合法性。
 
@@ -25,6 +25,7 @@ tags:
 - security
 ---
 -->
+
 
 <!--
  A cryptographically secure file used to validate access to the Kubernetes cluster.

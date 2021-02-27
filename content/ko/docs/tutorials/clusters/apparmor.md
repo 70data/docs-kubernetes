@@ -1,8 +1,10 @@
 ---
-reviewers:
-title: AppArmor
+title: AppArmor를 사용하여 리소스에 대한 컨테이너의 접근 제한
 content_type: tutorial
+weight: 10
 ---
+
+
 
 <!-- overview -->
 
@@ -13,7 +15,7 @@ AppArmor는 표준 리눅스 사용자와 그룹 기반의 권한을 보완하�
 프로그램을 제한하는 리눅스 커널 보안 모듈이다. AppArmor는 임의의 애플리케이션에 대해서
 잠재적인 공격 범위를 줄이고 더욱 심층적인 방어를 제공하도록 구성할 수 있다.
 이 기능은 특정 프로그램이나 컨테이너에서 필요한 리눅스 기능, 네트워크 사용, 파일 권한 등에 대한
-접근 허용 목록 조정한 프로파일로 구성한다. 각 프로파일은
+접근을 허용하는 프로파일로 구성한다. 각 프로파일은
 허용하지 않은 리소스 접근을 차단하는 *강제(enforcing)* 모드 또는
 위반만을 보고하는 *불평(complain)* 모드로 실행할 수 있다.
 
@@ -29,7 +31,7 @@ AppArmor를 이용하면 컨테이너가 수행할 수 있는 작업을 제한�
 
 
 * 노드에 프로파일을 어떻게 적재하는지 예시를 본다.
-* 파드(Pod)에 프로파일을 어떻게 강제 적용하는지 배운다.
+* 파드에 프로파일을 어떻게 강제 적용하는지 배운다.
 * 프로파일이 적재되었는지 확인하는 방법을 배운다.
 * 프로파일을 위반하는 경우를 살펴본다.
 * 프로파일을 적재할 수 없을 경우를 살펴본다.
@@ -76,7 +78,7 @@ AppArmor를 이용하면 컨테이너가 수행할 수 있는 작업을 제한�
 
 3. 컨테이너 런타임이 AppArmor을 지원한다. -- 현재 모든 일반적인 쿠버네티스를 지원하는
 {{< glossary_tooltip term_id="docker">}}, {{< glossary_tooltip term_id="cri-o" >}} 또는
-{{< glossary_tooltip term_id="containerd" >}} 와 같은 컨테이너 런타임들은 AppArmor를 지원해야 한다. 
+{{< glossary_tooltip term_id="containerd" >}} 와 같은 컨테이너 런타임들은 AppArmor를 지원해야 한다.
 이 런타임 설명서를 참조해서 클러스터가 AppArmor를 사용하기 위한
 요구 사항을 충족하는지 확인해야 한다.
 
@@ -468,5 +470,3 @@ AppArmor 로그는 `dmesg`에서 보이며, 오류는 보통 시스템 로그나
 
 * [퀵 가이드 AppArmor 프로파일 언어](https://gitlab.com/apparmor/apparmor/wikis/QuickProfileLanguage)
 * [AppArmor 코어 정책 참고](https://gitlab.com/apparmor/apparmor/wikis/Policy_Layout)
-
-

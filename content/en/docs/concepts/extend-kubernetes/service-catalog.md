@@ -26,7 +26,7 @@ Fortunately, there is a cloud provider that offers message queuing as a managed 
 
 A cluster operator can setup Service Catalog and use it to communicate with the cloud provider's service broker to provision an instance of the message queuing service and make it available to the application within the Kubernetes cluster.
 The application developer therefore does not need to be concerned with the implementation details or management of the message queue.
-The application can simply use it as a service.
+The application can access the message queue as a service.
 
 ## Architecture
 
@@ -229,7 +229,7 @@ The following example describes how to map secret values into application enviro
 
 * If you are familiar with {{< glossary_tooltip text="Helm Charts" term_id="helm-chart" >}}, [install Service Catalog using Helm](/docs/tasks/service-catalog/install-service-catalog-using-helm/) into your Kubernetes cluster. Alternatively, you can [install Service Catalog using the SC tool](/docs/tasks/service-catalog/install-service-catalog-using-sc/).
 * View [sample service brokers](https://github.com/openservicebrokerapi/servicebroker/blob/master/gettingStarted.md#sample-service-brokers).
-* Explore the [kubernetes-incubator/service-catalog](https://github.com/kubernetes-incubator/service-catalog) project.
+* Explore the [kubernetes-sigs/service-catalog](https://github.com/kubernetes-sigs/service-catalog) project.
 * View [svc-cat.io](https://svc-cat.io/docs/).
 
 

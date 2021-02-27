@@ -1,21 +1,4 @@
 aliases:
-  sig-cluster-lifecycle-kubeadm-approvers: # Approving changes to kubeadm documentation
-    - timothysc
-    - lukemarsden
-    - luxas
-    - fabriziopandini
-  sig-cluster-lifecycle-kubeadm-reviewers: # Reviewing kubeadm documentation
-    - timothysc
-    - lukemarsden
-    - luxas
-    - fabriziopandini
-    - kad
-    - xiangpengzhao
-    - stealthybox
-    - liztio
-    - chuckha
-    - detiber
-    - dixudx
   sig-docs-blog-owners: # Approvers for blog content
     - castrojo
     - kbarnard10
@@ -24,12 +7,10 @@ aliases:
     - mrbobbytables
   sig-docs-blog-reviewers: # Reviewers for blog content
     - castrojo
-    - cody-clark
     - kbarnard10
     - mrbobbytables
     - onlydole
-    - parispittman
-    - vonguard
+    - sftim
   sig-docs-de-owners: # Admins for German content
     - bene2k1
     - mkorbi
@@ -39,37 +20,33 @@ aliases:
     - mkorbi
     - rlenferink
   sig-docs-en-owners: # Admins for English content
+    - annajung
     - bradtopol
-    - daminisatya
+    - celestehorgan
+    - irvifa
     - jimangel
     - kbarnard10
     - kbhawkey
-    - makoscafee
     - onlydole
-    - Rajakavitha1
+    - reylejano
     - savitharaghunathan
     - sftim
     - steveperry-53
     - tengqm
-    - vineethreddy02
-    - xiangpengzhao
     - zacharysarah
     - zparnold
   sig-docs-en-reviews: # PR reviews for English content
     - bradtopol
+    - celestehorgan
     - daminisatya
     - jimangel
     - kbarnard10
     - kbhawkey
-    - makoscafee
     - onlydole
-    - rajakavitha1
     - rajeshdeshpande02
     - sftim
     - steveperry-53
     - tengqm
-    - xiangpengzhao
-    - zacharysarah
     - zparnold
   sig-docs-es-owners: # Admins for Spanish content
     - raelga
@@ -111,26 +88,34 @@ aliases:
     - avidLearnerInProgress
     - daminisatya
     - mittalyashu
-    - Rajakavitha1
   sig-docs-hi-reviews: # PR reviews for Hindi content
     - avidLearnerInProgress
     - daminisatya
     - mittalyashu
-    - Rajakavitha1
   sig-docs-id-owners: # Admins for Indonesian content
+    - ariscahyadi
+    - danninov
     - girikuncoro
+    - habibrosyad
     - irvifa
-  sig-docs-id-reviews: # PR reviews for Indonesian content
-    - girikuncoro
-    - irvifa
-    - wahyuoi
     - phanama
+    - wahyuoi
+  sig-docs-id-reviews: # PR reviews for Indonesian content
+    - ariscahyadi
+    - danninov
+    - girikuncoro
+    - habibrosyad
+    - irvifa
+    - phanama
+    - wahyuoi
   sig-docs-it-owners: # Admins for Italian content
     - fabriziopandini
+    - Fale
     - mattiaperi
     - micheleberardi
   sig-docs-it-reviews: # PR reviews for Italian content
     - fabriziopandini
+    - Fale
     - mattiaperi
     - micheleberardi
   sig-docs-ja-owners: # Admins for Japanese content
@@ -141,53 +126,54 @@ aliases:
     - bells17
     # cstoku
     - inductor
+    - kakts
     - makocchi-git
     # MasayaAoyama
     - nasa9084
-    - oke-py
+    # oke-py
   sig-docs-ko-owners: # Admins for Korean content
     - ClaudiaJKang
     - gochist
     - ianychoi
     - seokho-son
     - ysyukr
-    - zacharysarah
   sig-docs-ko-reviews: # PR reviews for Korean content
     - ClaudiaJKang
     - gochist
     - ianychoi
     - seokho-son
     - ysyukr
+    - pjhwa
+    - yoonian
   sig-docs-leads: # Website chairs and tech leads
+    - irvifa
     - jimangel
     - kbarnard10
     - kbhawkey
     - onlydole
     - sftim
-    - zacharysarah
   sig-docs-zh-owners: # Admins for Chinese content
-    - chenopis
+    # chenopis
     - chenrui333
-    - dchen1107
-    - haibinxie
-    - hanjiayao
-    - lichuqiang
-    - SataQiu
-    - tengqm
-    - xiangpengzhao
-    - xichengliudui
-    - zacharysarah
-    - zhangxiaoyu-zidif
-  sig-docs-zh-reviews: # PR reviews for Chinese content
-    - chenrui333
-    - idealhack
+    # dchen1107
+    # haibinxie
+    # hanjiayao
+    # lichuqiang
     - SataQiu
     - tanjunchen
     - tengqm
-    - xiangpengzhao
     - xichengliudui
-    - zhangxiaoyu-zidif
+    # zhangxiaoyu-zidif
+  sig-docs-zh-reviews: # PR reviews for Chinese content
+    - chenrui333
+    - howieyuen
+    - idealhack
     - pigletfly
+    - SataQiu
+    - tanjunchen
+    - tengqm
+    - xichengliudui
+    # zhangxiaoyu-zidif
   sig-docs-pt-owners: # Admins for Portuguese content
     - femrtnz
     - jcjesus
@@ -212,6 +198,7 @@ aliases:
     - potapy4
     - dianaabv
   sig-docs-ru-reviews: # PR reviews for Russian content
+    - Arhell
     - msheldyakov
     - aisonaku
     - potapy4
@@ -234,3 +221,12 @@ aliases:
     - idvoretskyi
     - MaxymVlasov
     - Potapy4
+  # authoritative source: git.k8s.io/community/OWNERS_ALIASES
+  committee-steering: # provide PR approvals for announcements
+    - cblecker
+    - derekwaynecarr
+    - dims
+    - liggitt
+    - mrbobbytables
+    - nikhita
+    - parispittman

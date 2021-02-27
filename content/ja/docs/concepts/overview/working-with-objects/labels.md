@@ -81,7 +81,7 @@ spec:
 
 ## ラベルセレクター {#label-selectors}
 
-[名前とUID](/docs/user-guide/identifiers)とは異なり、ラベルはユニーク性を提供しません。通常、多くのオブジェクトが同じラベルを保持することを想定します。
+[名前とUID](/ja/docs/concepts/overview/working-with-objects/names/)とは異なり、ラベルはユニーク性を提供しません。通常、多くのオブジェクトが同じラベルを保持することを想定します。
 
 *ラベルセレクター* を介して、クライアントとユーザーはオブジェクトのセットを指定できます。ラベルセレクターはKubernetesにおいてコアなグルーピング機能となります。
 
@@ -185,7 +185,7 @@ kubectl get pods -l 'environment in (production),tier in (frontend)'
 ```
 
 すでに言及したように、*集合ベース* の要件は、*等価ベース* の要件より表現力があります。  
-例えば、値に対する_OR_ オペレーターを実装して以下のように書けます。  
+例えば、値に対する _OR_ オペレーターを実装して以下のように書けます。  
 
 ```shell
 kubectl get pods -l 'environment in (production, qa)'
@@ -222,7 +222,7 @@ selector:
 
 #### *集合ベース* の要件指定をサポートするリソース
 
-[`Job`](/docs/concepts/workloads/controllers/jobs-run-to-completion/)や[`Deployment`](/ja/docs/concepts/workloads/controllers/deployment/)、[`ReplicaSet`](/ja/docs/concepts/workloads/controllers/replicaset/)や[`DaemonSet`](/ja/docs/concepts/workloads/controllers/daemonset/)などの比較的新しいリソースは、*集合ベース* での要件指定もサポートしています。  
+[`Job`](/docs/concepts/workloads/controllers/job/)や[`Deployment`](/ja/docs/concepts/workloads/controllers/deployment/)、[`ReplicaSet`](/ja/docs/concepts/workloads/controllers/replicaset/)や[`DaemonSet`](/ja/docs/concepts/workloads/controllers/daemonset/)などの比較的新しいリソースは、*集合ベース* での要件指定もサポートしています。  
 ```yaml
 selector:
   matchLabels:
@@ -238,6 +238,6 @@ selector:
 
 #### Nodeのセットを選択する  
 ラベルを選択するための1つのユースケースはPodがスケジュールできるNodeのセットを制限することです。  
-さらなる情報に関しては、[Node選定](/ja/docs/concepts/configuration/assign-pod-node/) のドキュメントを参照してください。 
+さらなる情報に関しては、[Node選定](/ja/docs/concepts/scheduling-eviction/assign-pod-node/) のドキュメントを参照してください。 
 
 

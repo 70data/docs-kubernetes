@@ -23,21 +23,17 @@ becoming unavailable. This task walks through the process of creating a high
 availability etcd cluster of three members that can be used as an external etcd
 when using kubeadm to set up a kubernetes cluster.
 
-
-
 ## {{% heading "prerequisites" %}}
-
 
 * Three hosts that can talk to each other over ports 2379 and 2380. This
   document assumes these default ports. However, they are configurable through
   the kubeadm config file.
-* Each host must [have docker, kubelet, and kubeadm installed][toolbox].
+* Each host must [have docker, kubelet, and kubeadm installed](/docs/setup/production-environment/tools/kubeadm/install-kubeadm/).
+* Each host should have access to the Kubernetes container image registry (`k8s.gcr.io`) or list/pull the required etcd image using
+`kubeadm config images list/pull`. This guide will setup etcd instances as
+[static pods](/docs/tasks/configure-pod-container/static-pod/) managed by a kubelet.
 * Some infrastructure to copy files between hosts. For example `ssh` and `scp`
   can satisfy this requirement.
-
-[toolbox]: /docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-
-
 
 <!-- steps -->
 
@@ -55,6 +51,7 @@ this example.
 
 1. Configure the kubelet to be a service manager for etcd.
 
+   {{< note >}}You must do this on every host where etcd should be running.{{< /note >}}
     Since etcd was created first, you must override the service priority by creating a new unit file
     that has higher precedence than the kubeadm-provided kubelet unit file.
 
@@ -69,6 +66,12 @@ this example.
 
     systemctl daemon-reload
     systemctl restart kubelet
+    ```
+
+    Check the kubelet status to ensure it is running.
+
+    ```sh
+    systemctl status kubelet
     ```
 
 1. Create configuration files for kubeadm.
@@ -273,5 +276,4 @@ this example.
 Once you have a working 3 member etcd cluster, you can continue setting up a
 highly available control plane using the [external etcd method with
 kubeadm](/docs/setup/production-environment/tools/kubeadm/high-availability/).
-
 

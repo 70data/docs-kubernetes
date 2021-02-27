@@ -1,24 +1,102 @@
 # Kubernetesのドキュメント
 
-[![Build Status](https://api.travis-ci.org/kubernetes/website.svg?branch=master)](https://travis-ci.org/kubernetes/website)
-[![GitHub release](https://img.shields.io/github/release/kubernetes/website.svg)](https://github.com/kubernetes/website/releases/latest)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/be93b718-a6df-402a-b4a4-855ba186c97d/deploy-status)](https://app.netlify.com/sites/kubernetes-io-master-staging/deploys) [![GitHub release](https://img.shields.io/github/release/kubernetes/website.svg)](https://github.com/kubernetes/website/releases/latest)
 
 このリポジトリには、[KubernetesのWebサイトとドキュメント](https://kubernetes.io/)をビルドするために必要な全アセットが格納されています。貢献に興味を持っていただきありがとうございます！
 
-## Hugoを使ってローカル環境でWebサイトを動かす
+# リポジトリの使い方
 
-Hugoのインストール方法については[Hugoの公式ドキュメント](https://gohugo.io/getting-started/installing/)をご覧ください。このとき、[`netlify.toml`](netlify.toml#L10)ファイルに記述されている`HUGO_VERSION`と同じバージョンをインストールするようにしてください。
+Hugo(Extended version)を使用してWebサイトをローカルで実行することも、コンテナランタイムで実行することもできます。コンテナランタイムを使用することを強くお勧めします。これにより、本番Webサイトとのデプロイメントの一貫性が得られます。
 
-Hugoがインストールできたら、以下のコマンドを使ってWebサイトをローカル上で動かすことができます:
+## 前提条件
 
-```bash
+このリポジトリを使用するには、以下をローカルにインストールする必要があります。
+
+- [npm](https://www.npmjs.com/)
+- [Go](https://golang.org/)
+- [Hugo(Extended version)](https://gohugo.io/)
+- [Docker](https://www.docker.com/)などのコンテナランタイム
+
+開始する前に、依存関係をインストールしてください。リポジトリのクローンを作成し、ディレクトリに移動します。
+
+```
 git clone https://github.com/kubernetes/website.git
 cd website
-git submodule update --init --recursive
-hugo server --buildFuture
+```
+
+KubernetesのWebサイトではDocsyというHugoテーマを使用しています。コンテナでWebサイトを実行する場合でも、以下を実行して、サブモジュールおよびその他の開発依存関係をプルすることを強くお勧めします。
+
+```
+# pull in the Docsy submodule
+git submodule update --init --recursive --depth 1
+```
+
+## コンテナを使ってウェブサイトを動かす
+
+コンテナ内でサイトを構築するには、以下を実行してコンテナイメージを構築し、実行します。
+
+```
+make container-image
+make container-serve
+```
+
+お使いのブラウザにて http://localhost:1313 にアクセスしてください。リポジトリ内のソースファイルに変更を加えると、HugoがWebサイトの内容を更新してブラウザに反映します。
+
+## Hugoを使ってローカル環境でWebサイトを動かす
+
+[`netlify.toml`](netlify.toml#L10)ファイルに記述されている`HUGO_VERSION`と同じExtended versionのHugoをインストールするようにしてください。
+
+ローカルでサイトを構築してテストするには、次のコマンドを実行します。
+
+```bash
+# install dependencies
+npm ci
+make serve
 ```
 
 これで、Hugoのサーバーが1313番ポートを使って開始します。お使いのブラウザにて http://localhost:1313 にアクセスしてください。リポジトリ内のソースファイルに変更を加えると、HugoがWebサイトの内容を更新してブラウザに反映します。
+
+## トラブルシューティング
+
+### error: failed to transform resource: TOCSS: failed to transform "scss/main.scss" (text/x-scss): this feature is not available in your current Hugo version
+
+Hugoは、技術的な理由から2種類のバイナリがリリースされています。現在のウェブサイトは**Hugo Extended**バージョンのみに基づいて運営されています。[リリースページ](https://github.com/gohugoio/hugo/releases)で名前に「extended」が含まれるアーカイブを探します。確認するには、`hugo version`を実行し、「extended」という単語を探します。
+
+### macOSにてtoo many open filesというエラーが表示される
+
+macOS上で`make serve`を実行した際に以下のエラーが表示される場合
+
+```
+ERROR 2020/08/01 19:09:18 Error: listen tcp 127.0.0.1:1313: socket: too many open files
+make: *** [serve] Error 1
+```
+
+OS上で同時に開けるファイルの上限を確認してください。
+
+`launchctl limit maxfiles`
+
+続いて、以下のコマンドを実行します(https://gist.github.com/tombigel/d503800a282fcadbee14b537735d202c より引用)。
+
+```
+#!/bin/sh
+
+# These are the original gist links, linking to my gists now.
+# curl -O https://gist.githubusercontent.com/a2ikm/761c2ab02b7b3935679e55af5d81786a/raw/ab644cb92f216c019a2f032bbf25e258b01d87f9/limit.maxfiles.plist
+# curl -O https://gist.githubusercontent.com/a2ikm/761c2ab02b7b3935679e55af5d81786a/raw/ab644cb92f216c019a2f032bbf25e258b01d87f9/limit.maxproc.plist
+
+curl -O https://gist.githubusercontent.com/tombigel/d503800a282fcadbee14b537735d202c/raw/ed73cacf82906fdde59976a0c8248cce8b44f906/limit.maxfiles.plist
+curl -O https://gist.githubusercontent.com/tombigel/d503800a282fcadbee14b537735d202c/raw/ed73cacf82906fdde59976a0c8248cce8b44f906/limit.maxproc.plist
+
+sudo mv limit.maxfiles.plist /Library/LaunchDaemons
+sudo mv limit.maxproc.plist /Library/LaunchDaemons
+
+sudo chown root:wheel /Library/LaunchDaemons/limit.maxfiles.plist
+sudo chown root:wheel /Library/LaunchDaemons/limit.maxproc.plist
+
+sudo launchctl load -w /Library/LaunchDaemons/limit.maxfiles.plist
+```
+
+こちらはmacOSのCatalinaとMojaveで動作を確認しています。
 
 ## SIG Docsに参加する
 
@@ -33,11 +111,11 @@ hugo server --buildFuture
 
 GitHubの画面右上にある**Fork**ボタンをクリックすると、お使いのGitHubアカウントに紐付いた本リポジトリのコピーが作成され、このコピーのことを*フォーク*と呼びます。フォークリポジトリの中ではお好きなように変更を加えていただいて構いません。加えた変更をこのリポジトリに追加したい任意のタイミングにて、フォークリポジトリからPull Reqeustを作成してください。
 
-Pull Requestが作成されると、レビュー担当者が責任を持って明確かつ実用的なフィードバックを返します。
-Pull Requestの所有者は作成者であるため、**ご自身で作成したPull Requestを編集し、フィードバックに対応するのはご自身の役目です。**
+Pull Requestが作成されると、レビュー担当者が責任を持って明確かつ実用的なフィードバックを返します。Pull Requestの所有者は作成者であるため、**ご自身で作成したPull Requestを編集し、フィードバックに対応するのはご自身の役目です。**
+
 また、状況によっては2人以上のレビュアーからフィードバックが返されたり、アサインされていないレビュー担当者からのフィードバックが来ることがある点もご注意ください。
-さらに、特定のケースにおいては、レビュー担当者がKubernetesの技術的なレビュアーに対してレビューを依頼することもあります。
-レビュー担当者はタイムリーにフィードバックを提供するために最善を尽くしますが、応答時間は状況に応じて異なる場合があります。
+
+さらに、特定のケースにおいては、レビュー担当者がKubernetesの技術的なレビュアーに対してレビューを依頼することもあります。レビュー担当者はタイムリーにフィードバックを提供するために最善を尽くしますが、応答時間は状況に応じて異なる場合があります。
 
 Kubernetesのドキュメントへの貢献に関する詳細については以下のページをご覧ください:
 

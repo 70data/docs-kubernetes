@@ -1,24 +1,20 @@
 ---
 title: 데몬셋(DaemonSet)에서 롤링 업데이트 수행
-content_template: templates/task
+content_type: task
 weight: 10
 ---
 
-{{% capture overview %}}
+
+
+<!-- overview -->
 
 이 페이지는 데몬셋에서 롤링 업데이트를 수행하는 방법을 보여준다.
 
-{{% /capture %}}
-
-
-{{% capture prerequisites %}}
+## {{% heading "prerequisites" %}}
 
 * 데몬셋 롤링 업데이트 기능은 쿠버네티스 버전 1.6 이상에서만 지원된다.
 
-{{% /capture %}}
-
-
-{{% capture steps %}}
+<!-- steps -->
 
 ## 데몬셋 업데이트 전략
 
@@ -161,7 +157,7 @@ kubectl get pods -l name=fluentd-elasticsearch -o wide -n kube-system
 
 {{< note >}}
 삭제된 파드가 컨트롤러에 의해 제어되지 않거나 파드가 복제되지 않은 경우 서비스 중단이
-발생한다. 이 때 [PodDisruptionBudget](/docs/tasks/configure-pod-container/configure-pod-disruption-budget/)정책도 적용되지
+발생한다. 이 때 [PodDisruptionBudget](/docs/tasks/run-application/configure-pdb/)정책도 적용되지
 않는다.
 {{< /note >}}
 
@@ -188,13 +184,12 @@ kubectl get pods -l name=fluentd-elasticsearch -o wide -n kube-system
 kubectl delete ds fluentd-elasticsearch -n kube-system
 ```
 
-{{% /capture %}}
 
 
-{{% capture whatsnext %}}
+
+## {{% heading "whatsnext" %}}
+
 
 * [태스크: 데몬셋에서 롤백
   수행](/ko/docs/tasks/manage-daemon/rollback-daemon-set/)을 참고한다.
 * [개념: 기존 데몬셋 파드를 채택하기 위한 데몬셋 생성](/ko/docs/concepts/workloads/controllers/daemonset/)을 참고한다.
-
-{{% /capture %}}

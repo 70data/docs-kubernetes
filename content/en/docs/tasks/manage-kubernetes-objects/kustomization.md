@@ -8,7 +8,7 @@ weight: 20
 
 [Kustomize](https://github.com/kubernetes-sigs/kustomize) is a standalone tool
 to customize Kubernetes objects
-through a [kustomization file](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/glossary.md#kustomization).
+through a [kustomization file](https://kubernetes-sigs.github.io/kustomize/api-reference/glossary/#kustomization).
 
 Since 1.14, Kubectl also
 supports the management of Kubernetes objects using a kustomization file.
@@ -392,8 +392,8 @@ spec:
       containers:
       - name: my-nginx
         resources:
-        limits:
-          memory: 512Mi
+          limits:
+            memory: 512Mi
 EOF
 
 cat <<EOF >./kustomization.yaml
@@ -424,11 +424,12 @@ spec:
     spec:
       containers:
       - image: nginx
-        limits:
-          memory: 512Mi
         name: my-nginx
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            memory: 512Mi
 ```
 
 Not all Resources or fields support strategic merge patches. To support modifying arbitrary fields in arbitrary Resources,
@@ -590,7 +591,7 @@ spec:
       containers:
       - name: my-nginx
         image: nginx
-        command: ["start", "--host", "\$(MY_SERVICE_NAME)"]
+        command: ["start", "--host", "$(MY_SERVICE_NAME)"]
 EOF
 
 # Create a service.yaml file
@@ -832,7 +833,7 @@ deployment.apps "dev-my-nginx" deleted
 
 * [Kustomize](https://github.com/kubernetes-sigs/kustomize)
 * [Kubectl Book](https://kubectl.docs.kubernetes.io)
-* [Kubectl Command Reference](/docs/reference/generated/kubectl/kubectl/)
+* [Kubectl Command Reference](/docs/reference/generated/kubectl/kubectl-commands/)
 * [Kubernetes API Reference](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/)
 
 

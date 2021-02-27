@@ -47,6 +47,13 @@ Limits can be implemented either reactively (the system intervenes once it sees 
 or by enforcement (the system prevents the container from ever exceeding the limit). Different
 runtimes can have different ways to implement the same restrictions.
 
+{{< note >}}
+If a Container specifies its own memory limit, but does not specify a memory request, Kubernetes
+automatically assigns a memory request that matches the limit. Similarly, if a Container specifies its own
+CPU limit, but does not specify a CPU request, Kubernetes automatically assigns a CPU request that matches
+the limit.
+{{< /note >}}
+
 ## Resource types
 
 *CPU* and *memory* are each a *resource type*. A resource type has a base unit.
@@ -111,7 +118,7 @@ CPU is always requested as an absolute quantity, never as a relative quantity;
 ### Meaning of memory
 
 Limits and requests for `memory` are measured in bytes. You can express memory as
-a plain integer or as a fixed-point integer using one of these suffixes:
+a plain integer or as a fixed-point number using one of these suffixes:
 E, P, T, G, M, K. You can also use the power-of-two equivalents: Ei, Pi, Ti, Gi,
 Mi, Ki. For example, the following represent roughly the same value:
 
@@ -132,11 +139,8 @@ metadata:
   name: frontend
 spec:
   containers:
-  - name: db
-    image: mysql
-    env:
-    - name: MYSQL_ROOT_PASSWORD
-      value: "password"
+  - name: app
+    image: images.my-company.example/app:v4
     resources:
       requests:
         memory: "64Mi"
@@ -144,8 +148,8 @@ spec:
       limits:
         memory: "128Mi"
         cpu: "500m"
-  - name: wp
-    image: wordpress
+  - name: log-aggregator
+    image: images.my-company.example/log-aggregator:v6
     resources:
       requests:
         memory: "64Mi"
@@ -227,7 +231,7 @@ locally-attached writeable devices or, sometimes, by RAM.
 
 Pods use ephemeral local storage for scratch space, caching, and for logs.
 The kubelet can provide scratch space to Pods using local ephemeral storage to
-mount [`emptyDir`](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
+mount [`emptyDir`](/docs/concepts/storage/volumes/#emptydir)
  {{< glossary_tooltip term_id="volume" text="volumes" >}} into containers.
 
 The kubelet also uses this kind of storage to hold
@@ -313,7 +317,7 @@ You can use _ephemeral-storage_ for managing local ephemeral storage. Each Conta
 * `spec.containers[].resources.requests.ephemeral-storage`
 
 Limits and requests for `ephemeral-storage` are measured in bytes. You can express storage as
-a plain integer or as a fixed-point integer using one of these suffixes:
+a plain integer or as a fixed-point number using one of these suffixes:
 E, P, T, G, M, K. You can also use the power-of-two equivalents: Ei, Pi, Ti, Gi,
 Mi, Ki. For example, the following represent roughly the same value:
 
@@ -330,18 +334,15 @@ metadata:
   name: frontend
 spec:
   containers:
-  - name: db
-    image: mysql
-    env:
-    - name: MYSQL_ROOT_PASSWORD
-      value: "password"
+  - name: app
+    image: images.my-company.example/app:v4
     resources:
       requests:
         ephemeral-storage: "2Gi"
       limits:
         ephemeral-storage: "4Gi"
-  - name: wp
-    image: wordpress
+  - name: log-aggregator
+    image: images.my-company.example/log-aggregator:v6
     resources:
       requests:
         ephemeral-storage: "2Gi"
@@ -395,7 +396,7 @@ The kubelet supports different ways to measure Pod storage use:
 
 {{< tabs name="resource-emphemeralstorage-measurement" >}}
 {{% tab name="Periodic scanning" %}}
-The kubelet performs regular, schedules checks that scan each
+The kubelet performs regular, scheduled checks that scan each
 `emptyDir` volume, container log directory, and writeable container layer.
 
 The scan measures how much space is used.
@@ -444,7 +445,7 @@ If you want to use project quotas, you should:
   [feature gate](/docs/reference/command-line-tools-reference/feature-gates/)
   in the kubelet configuration.
 
-* Ensure that the the root filesystem (or optional runtime filesystem)
+* Ensure that the root filesystem (or optional runtime filesystem)
   has project quotas enabled. All XFS filesystems support project quotas.
   For ext4 filesystems, you need to enable the project quota tracking feature
   while the filesystem is not mounted.
@@ -599,6 +600,10 @@ spec:
         example.com/foo: 1
 ```
 
+## PID limiting
+
+Process ID (PID) limits allow for the configuration of a kubelet to limit the number of PIDs that a given Pod can consume. See [Pid Limiting](/docs/concepts/policy/pid-limiting/) for information.
+
 ## Troubleshooting
 
 ### My Pods are pending with event message failedScheduling
@@ -657,7 +662,7 @@ Allocated resources:
   (Total limits may be over 100 percent, i.e., overcommitted.)
   CPU Requests    CPU Limits    Memory Requests    Memory Limits
   ------------    ----------    ---------------    -------------
-  680m (34%)      400m (20%)    920Mi (12%)        1070Mi (14%)
+  680m (34%)      400m (20%)    920Mi (11%)        1070Mi (13%)
 ```
 
 In the preceding output, you can see that if a Pod requests more than 1120m
@@ -757,6 +762,4 @@ You can see that the Container was terminated because of `reason:OOM Killed`, wh
 
 * Read the [ResourceRequirements](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#resourcerequirements-v1-core) API reference
 
-* Read about [project quotas](http://xfs.org/docs/xfsdocs-xml-dev/XFS_User_Guide/tmp/en-US/html/xfs-quotas.html) in XFS
-
-
+* Read about [project quotas](https://xfs.org/docs/xfsdocs-xml-dev/XFS_User_Guide/tmp/en-US/html/xfs-quotas.html) in XFS

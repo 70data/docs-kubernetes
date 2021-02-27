@@ -64,7 +64,7 @@ on every resource object.
 | Key                                 | Description           | Example  | Type |
 | ----------------------------------- | --------------------- | -------- | ---- |
 | `app.kubernetes.io/name`            | The name of the application | `mysql` | string |
-| `app.kubernetes.io/instance`        | A unique name identifying the instance of an application | `wordpress-abcxzy` | string |
+| `app.kubernetes.io/instance`        | A unique name identifying the instance of an application | `mysql-abcxzy` | string |
 | `app.kubernetes.io/version`         | The current version of the application (e.g., a semantic version, revision hash, etc.) | `5.7.21` | string |
 | `app.kubernetes.io/component`       | The component within the architecture | `database` | string |
 | `app.kubernetes.io/part-of`         | The name of a higher level application this one is part of | `wordpress` | string |
@@ -73,7 +73,7 @@ on every resource object.
 | 键                                 | 描述           | 示例  | 类型 |
 | ----------------------------------- | --------------------- | -------- | ---- |
 | `app.kubernetes.io/name`            | 应用程序的名称 | `mysql` | 字符串 |
-| `app.kubernetes.io/instance`        | 用于唯一确定应用实例的名称 | `wordpress-abcxzy` | 字符串 |
+| `app.kubernetes.io/instance`        | 用于唯一确定应用实例的名称 | `mysql-abcxzy` | 字符串 |
 | `app.kubernetes.io/version`         | 应用程序的当前版本（例如，语义版本，修订版哈希等） | `5.7.21` | 字符串 |
 | `app.kubernetes.io/component`       | 架构中的组件 | `database` | 字符串 |
 | `app.kubernetes.io/part-of`         | 此级别的更高级别应用程序的名称 | `wordpress` | 字符串 |
@@ -89,7 +89,7 @@ kind: StatefulSet
 metadata:
   labels:
     app.kubernetes.io/name: mysql
-    app.kubernetes.io/instance: wordpress-abcxzy
+    app.kubernetes.io/instance: mysql-abcxzy
     app.kubernetes.io/version: "5.7.21"
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: wordpress
@@ -100,8 +100,8 @@ metadata:
 ## Applications And Instances Of Applications
 
 An application can be installed one or more times into a Kubernetes cluster and,
-in some cases, the same namespace. For example, wordpress can be installed more
-than once where different websites are different installations of wordpress.
+in some cases, the same namespace. For example, WordPress can be installed more
+than once where different websites are different installations of WordPress.
 
 The name of an application and the instance name are recorded separately. For
 example, WordPress has a `app.kubernetes.io/name` of `wordpress` while it has
@@ -111,7 +111,7 @@ to be identifiable. Every instance of an application must have a unique name.
 -->
 ## 应用和应用实例
 
-应用可以在 Kubernetes 集群中安装一次或多次。在某些情况下，可以安装在同一命名空间中。例如，可以不止一次地为不同的站点安装不同的 wordpress。
+应用可以在 Kubernetes 集群中安装一次或多次。在某些情况下，可以安装在同一命名空间中。例如，可以不止一次地为不同的站点安装不同的 WordPress。
 
 应用的名称和实例的名称是分别记录的。例如，某 WordPress 实例的 `app.kubernetes.io/name` 为 `wordpress`，而其实例名称表现为 `app.kubernetes.io/instance` 的属性值 `wordpress-abcxzy`。这使应用程序和应用程序的实例成为可能是可识别的。应用程序的每个实例都必须具有唯一的名称。
 

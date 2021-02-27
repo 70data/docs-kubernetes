@@ -10,8 +10,6 @@ weight: 60
 소유자가 없는 오브젝트들을 삭제하는 역할을 한다.
 
 
-
-
 <!-- body -->
 
 ## 소유자(owner)와 종속(dependent)
@@ -22,7 +20,7 @@ weight: 60
 필드를 가지고 있다.
 
 때때로, 쿠버네티스는 `ownerReference` 값을 자동적으로 설정한다.
-예를 들어 레플리카셋을 만들 때 쿠버네티스는 레플리카셋에 있는 각 파드의 
+예를 들어 레플리카셋을 만들 때 쿠버네티스는 레플리카셋에 있는 각 파드의
 `ownerReference` 필드를 자동으로 설정한다. 1.8 에서는 쿠버네티스가
 레플리케이션컨트롤러, 레플리카셋, 스테이트풀셋, 데몬셋, 디플로이먼트, 잡
 그리고 크론잡에 의해서 생성되거나 차용된 오브젝트의 `ownerReference` 값을
@@ -35,7 +33,7 @@ weight: 60
 
 {{< codenew file="controllers/replicaset.yaml" >}}
 
-레플리카셋을 생성하고 파드의 메타데이터를 본다면, 
+레플리카셋을 생성하고 파드의 메타데이터를 본다면,
 OwnerReferences 필드를 찾을 수 있다.
 
 ```shell
@@ -61,18 +59,29 @@ metadata:
 ```
 
 {{< note >}}
-교차 네임스페이스(cross-namespace)의 소유자 참조는 디자인상 허용되지 않는다. 이는 다음을 의미한다.
-1) 네임스페이스 범위의 종속 항목은 동일한 네임스페이스의 소유자와
-클러스터 범위의 소유자만 지정할 수 있다.
-2) 클러스터 범위의 종속 항목은 클러스터 범위의 소유자만 지정할 수 있으며,
-네임스페이스 범위의 소유자는 불가하다.
+교차 네임스페이스(cross-namespace)의 소유자 참조는 디자인상 허용되지 않는다.
+
+네임스페이스 종속 항목은 클러스터 범위 또는 네임스페이스 소유자를 지정할 수 있다.
+네임스페이스 소유자는 **반드시** 종속 항목과 동일한 네임스페이스에 있어야 한다.
+그렇지 않은 경우, 소유자 참조는 없는 것으로 처리되며, 소유자가 없는 것으로 확인되면
+종속 항목이 삭제될 수 있다.
+
+클러스터 범위의 종속 항목은 클러스터 범위의 소유자만 지정할 수 있다.
+v1.20 이상에서 클러스터 범위의 종속 항목이 네임스페이스 종류를 소유자로 지정하면,
+확인할 수 없는 소유자 참조가 있는 것으로 처리되고 가비지 수집이 될 수 없다.
+
+v1.20 이상에서 가비지 수집기가 잘못된 교차 네임스페이스 `ownerReference`
+또는 네임스페이스 종류를 참조하는 `ownerReference` 가 있는 클러스터 범위의 종속 항목을 감지하면,
+`OwnerRefInvalidNamespace` 의 원인이 있는 경고 이벤트와 유효하지 않은 종속 항목의 `involvedObject` 가 보고된다.
+`kubectl get events -A --field-selector=reason=OwnerRefInvalidNamespace` 를 실행하여
+이러한 종류의 이벤트를 확인할 수 있다.
 {{< /note >}}
 
 ## 가비지 수집기의 종속 항목 삭제 방식 제어
 
 오브젝트를 삭제할 때, 오브젝트의 종속 항목을 자동으로 삭제하는지의
 여부를 지정할 수 있다. 종속 항목을 자동으로 삭제하는 것을 *캐스케이딩(cascading)
-삭제* 라고 한다.  *캐스케이딩 삭제* 에는 *백그라운드* 와 *포어그라운드* 2가지 모드가 있다.
+삭제* 라고 한다. *캐스케이딩 삭제* 에는 *백그라운드* 와 *포어그라운드* 2가지 모드가 있다.
 
 만약 종속 항목을 자동으로 삭제하지 않고 오브젝트를 삭제한다면,
 종속 항목은 *분리됨(orphaned)* 이라고 한다.
@@ -113,12 +122,6 @@ metadata:
 인수를 `propagationPolicy` 필드에 설정한다. 여기에 가능한 값으로는 "Orphan",
 "Foreground" 또는 "Background" 이다.
 
-쿠버네티스 1.9 이전에는 많은 컨트롤러의 리소스에 대한 기본 가비지 수집 정책이 `orphan` 이었다.
-여기에는 레플리케이션컨트롤러, 레플리카셋, 스테이트풀셋, 데몬셋 그리고
-디플로이먼트가 포함된다. 그룹 버전 `extensions/v1beta1`, `apps/v1beta1` 그리고 `apps/v1beta2` 의 kinds에서는
-달리 지정하지 않는 한 오브젝트가 분리되는 것이 기본이다. 쿠버네티스 1.9에서는 그룹 버전 `apps/v1` 의 모든 kinds에 해당하는
-종속 오브젝트들이 기본적으로 삭제된다.
-
 여기에 백그라운드에서 종속 항목을 삭제하는 예시가 있다.
 
 ```shell
@@ -147,9 +150,12 @@ curl -X DELETE localhost:8080/apis/apps/v1/namespaces/default/replicasets/my-rep
 ```
 
 kubectl도 캐스케이딩 삭제를 지원한다.
-kubectl을 사용해서 종속 항목을 자동으로 삭제하려면 `--cascade` 를 true로 설정한다.  종속 항목을
-분리하기 위해서는 `--cascase` 를 false로 설정한다. `--cascade` 의 기본값은
-true 이다.
+
+kubectl을 사용해서 포어그라운드의 종속 항목을 삭제하려면 `--cascade=foreground` 를 설정한다. 종속 항목을
+분리하기 위해서는 `--cascade=orphan` 를 설정한다.
+
+기본 동작은 백그라운드의 종속 항목을 삭제하는 것이며,
+이는 `--cascade` 를 생략하거나 명시적으로 `background` 를 설정한 경우의 동작에 해당한다.
 
 여기에 레플리카셋의 종속 항목을 분리로 만드는 예시가 있다.
 
@@ -160,7 +166,7 @@ kubectl delete replicaset my-repset --cascade=false
 ### 디플로이먼트에 대한 추가 참고
 
 1.7 이전에서는 디플로이먼트와 캐스케이딩 삭제를 사용하면 반드시 `propagationPolicy: Foreground`
-를 사용해서 생성된 레플리카셋 뿐만 아니라 해당 파드도 삭제해야 한다. 만약 이 _propagationPolicy_
+를 사용해서 생성된 레플리카셋뿐만 아니라 해당 파드도 삭제해야 한다. 만약 이 _propagationPolicy_
 유형을 사용하지 않는다면, 레플리카셋만 삭제되고 파드는 분리된 상태로 남을 것이다.
 더 많은 정보는 [kubeadm/#149](https://github.com/kubernetes/kubeadm/issues/149#issuecomment-284766613)를 본다.
 
@@ -170,14 +176,9 @@ kubectl delete replicaset my-repset --cascade=false
 
 
 
-
 ## {{% heading "whatsnext" %}}
 
 
 [디자인 문서 1](https://git.k8s.io/community/contributors/design-proposals/api-machinery/garbage-collection.md)
 
 [디자인 문서 2](https://git.k8s.io/community/contributors/design-proposals/api-machinery/synchronous-garbage-collection.md)
-
-
-
-

@@ -20,10 +20,9 @@ _레이블_ 은 파드와 같은 오브젝트에 첨부된 키와 값의 쌍이�
 }
 ```
 
-레이블은 UI와 CLI에서 효율적인 쿼리를 사용하고 검색에 사용하기에 적합하다. 식별되지 않는 정보는 [어노테이션](/ko/docs/concepts/overview/working-with-objects/annotations/)으로 기록해야 한다.
-
-
-
+레이블은 UI와 CLI에서 효율적인 쿼리를 사용하고 검색에 사용하기에
+적합하다. 식별되지 않는 정보는
+[어노테이션](/ko/docs/concepts/overview/working-with-objects/annotations/)으로 기록해야 한다.
 
 <!-- body -->
 
@@ -83,10 +82,11 @@ API는 현재 _일치성 기준_ 과 _집합성 기준_ 이라는 두 종류의 
 레이블 셀렉터는 쉼표로 구분된 다양한 _요구사항_ 에 따라 만들 수 있다. 다양한 요구사항이 있는 경우 쉼표 기호가 AND(`&&`) 연산자로 구분되는 역할을 하도록 해야 한다.
 
 비어있거나 지정되지 않은 셀렉터는 상황에 따라 달라진다.
-셀렉터를 사용하는 API 유형은 유효성과 의미를 문서화해야 한다.
+셀렉터를 사용하는 API 유형은 유효성과 의미를
+문서화해야 한다.
 
 {{< note >}}
-레플리카 셋과 같은 일부 API 유형에서 두 인스턴스의 레이블 셀렉터는 네임스페이스 내에서 겹치지 않아야 한다. 그렇지 않으면 컨트롤러는 상충하는 명령으로 보고, 얼마나 많은 복제본이 필요한지 알 수 없다.
+레플리카셋(ReplicaSet)과 같은 일부 API 유형에서 두 인스턴스의 레이블 셀렉터는 네임스페이스 내에서 겹치지 않아야 한다. 그렇지 않으면 컨트롤러는 상충하는 명령으로 보고, 얼마나 많은 복제본이 필요한지 알 수 없다.
 {{< /note >}}
 
 {{< caution >}}
@@ -129,7 +129,7 @@ spec:
 
 ### _집합성 기준_ 요건
 
-_집합성 기준_ 레이블 요건에 따라 값 집합을 키로 필터링할 수 있다. `in`,`notin` and `exists`(키 식별자만 해당)의 3개의 연산자를 지원한다. 예를 들면,
+_집합성 기준_ 레이블 요건에 따라 값 집합을 키로 필터링할 수 있다. `in`,`notin`과 `exists`(키 식별자만 해당)의 3개의 연산자를 지원한다. 예를 들면,
 
 ```
 environment in (production, qa)
@@ -138,10 +138,11 @@ partition
 !partition
 ```
 
-첫 번째 예시에서 키가 `environment`이고 값이 `production` 또는 `qa`인 모든 리소스를 선택한다.
-두 번째 예시에서 키가 `tier`이고 값이 `frontend`와 `backend`를 가지는 리소스를 제외한 모든 리소스와 키로 `tier`를 가지고 값을 공백으로 가지는 모든 리소스를 선택한다.
-세 번째 예시에서 레이블의 값에 상관없이 키가 `partition`을 포함하는 모든 리소스를 선택한다.
-네 번째 예시에서 레이블의 값에 상관없이 키가 `partition`을 포함하지 않는 모든 리소스를 선택한다.
+* 첫 번째 예시에서 키가 `environment`이고 값이 `production` 또는 `qa`인 모든 리소스를 선택한다.
+* 두 번째 예시에서 키가 `tier`이고 값이 `frontend`와 `backend`를 가지는 리소스를 제외한 모든 리소스와 키로 `tier`를 가지고 값을 공백으로 가지는 모든 리소스를 선택한다.
+* 세 번째 예시에서 레이블의 값에 상관없이 키가 `partition`을 포함하는 모든 리소스를 선택한다.
+* 네 번째 예시에서 레이블의 값에 상관없이 키가 `partition`을 포함하지 않는 모든 리소스를 선택한다.
+
 마찬가지로 쉼표는 _AND_ 연산자로 작동한다. 따라서 `partition,environment notin (qa)`와 같이 사용하면 값과 상관없이 키가 `partition`인 것과 키가 `environment`이고 값이 `qa`와 다른 리소스를 필터링할 수 있다.
 _집합성 기준_ 레이블 셀렉터는 일반적으로 `environment=production`과 `environment in (production)`을 같은 것으로 본다. 유사하게는 `!=`과 `notin`을 같은 것으로 본다.
 
@@ -182,11 +183,14 @@ kubectl get pods -l 'environment,environment notin (frontend)'
 
 ### API 오브젝트에서 참조 설정
 
-[`services`](/ko/docs/concepts/services-networking/service/) 와 [`replicationcontrollers`](/ko/docs/concepts/workloads/controllers/replicationcontroller/)와 같은 일부 쿠버네티스 오브젝트는 레이블 셀렉터를 사용해서 [파드](/ko/docs/concepts/workloads/pods/pod/)와 같은 다른 리소스 집합을 선택한다.
+[`services`](/ko/docs/concepts/services-networking/service/) 와
+[`replicationcontrollers`](/ko/docs/concepts/workloads/controllers/replicationcontroller/)와 같은
+일부 쿠버네티스 오브젝트는 레이블 셀렉터를 사용해서
+[파드](/ko/docs/concepts/workloads/pods/)와 같은 다른 리소스 집합을 선택한다.
 
 #### 서비스와 레플리케이션 컨트롤러
 
-`services`에서 지정하는 파드 집합은 레이블 셀렉터로 정의한다. 마찬가지로 `replicationcontrollers`가 관리하는 파드의 개체군도 레이블 셀렉터로 정의한다.
+`services`에서 지정하는 파드 집합은 레이블 셀렉터로 정의한다. 마찬가지로 `replicationcontrollers`가 관리하는 파드의 오브젝트 그룹도 레이블 셀렉터로 정의한다.
 
 서비스와 레플리케이션 컨트롤러의 레이블 셀렉터는 `json` 또는 `yaml` 파일에 매핑된 _균등-기반_ 요구사항의 셀렉터만 지원한다.
 
@@ -207,7 +211,11 @@ selector:
 
 #### 세트-기반 요건을 지원하는 리소스
 
-[`Job`](/ko/docs/concepts/workloads/controllers/jobs-run-to-completion/), [`Deployment`](/ko/docs/concepts/workloads/controllers/deployment/), [`ReplicaSet`](/ko/docs/concepts/workloads/controllers/replicaset/) 그리고 [`DaemonSet`](/ko/docs/concepts/workloads/controllers/daemonset/) 같은 새로운 리소스들은 집합성 기준의 요건도 지원한다.
+[`Job`](/ko/docs/concepts/workloads/controllers/job/),
+[`Deployment`](/ko/docs/concepts/workloads/controllers/deployment/),
+[`ReplicaSet`](/ko/docs/concepts/workloads/controllers/replicaset/) 그리고
+[`DaemonSet`](/ko/docs/concepts/workloads/controllers/daemonset/) 같은
+새로운 리소스들은 _집합성 기준_ 의 요건도 지원한다.
 
 ```yaml
 selector:
@@ -224,5 +232,4 @@ selector:
 
 레이블을 통해 선택하는 사용 사례 중 하나는 파드를 스케줄 할 수 있는 노드 셋을 제한하는 것이다.
 자세한 내용은 [노드 선택](/ko/docs/concepts/scheduling-eviction/assign-pod-node/) 문서를 참조한다.
-
 

@@ -35,7 +35,7 @@ on every resource object.
 | Key                                 | Description           | Example  | Type |
 | ----------------------------------- | --------------------- | -------- | ---- |
 | `app.kubernetes.io/name`            | The name of the application | `mysql` | string |
-| `app.kubernetes.io/instance`        | A unique name identifying the instance of an application | `wordpress-abcxzy` | string |
+| `app.kubernetes.io/instance`        | A unique name identifying the instance of an application | `mysql-abcxzy` | string |
 | `app.kubernetes.io/version`         | The current version of the application (e.g., a semantic version, revision hash, etc.) | `5.7.21` | string |
 | `app.kubernetes.io/component`       | The component within the architecture | `database` | string |
 | `app.kubernetes.io/part-of`         | The name of a higher level application this one is part of | `wordpress` | string |
@@ -49,7 +49,7 @@ kind: StatefulSet
 metadata:
   labels:
     app.kubernetes.io/name: mysql
-    app.kubernetes.io/instance: wordpress-abcxzy
+    app.kubernetes.io/instance: mysql-abcxzy
     app.kubernetes.io/version: "5.7.21"
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: wordpress
@@ -59,8 +59,8 @@ metadata:
 ## Applications And Instances Of Applications
 
 An application can be installed one or more times into a Kubernetes cluster and,
-in some cases, the same namespace. For example, wordpress can be installed more
-than once where different websites are different installations of wordpress.
+in some cases, the same namespace. For example, WordPress can be installed more
+than once where different websites are different installations of WordPress.
 
 The name of an application and the instance name are recorded separately. For
 example, WordPress has a `app.kubernetes.io/name` of `wordpress` while it has
@@ -168,6 +168,6 @@ metadata:
 ...
 ```
 
-With the MySQL `StatefulSet` and `Service` you'll notice information about both MySQL and Wordpress, the broader application, are included.
+With the MySQL `StatefulSet` and `Service` you'll notice information about both MySQL and WordPress, the broader application, are included.
 
 

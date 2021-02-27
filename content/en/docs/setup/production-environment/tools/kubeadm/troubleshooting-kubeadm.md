@@ -15,10 +15,9 @@ If your problem is not listed below, please follow the following steps:
   - Go to [github.com/kubernetes/kubeadm](https://github.com/kubernetes/kubeadm/issues) and search for existing issues.
   - If no issue exists, please [open one](https://github.com/kubernetes/kubeadm/issues/new) and follow the issue template.
 
-- If you are unsure about how kubeadm works, you can ask on [Slack](http://slack.k8s.io/) in #kubeadm, or open a question on [StackOverflow](https://stackoverflow.com/questions/tagged/kubernetes). Please include
+- If you are unsure about how kubeadm works, you can ask on [Slack](https://slack.k8s.io/) in `#kubeadm`,
+  or open a question on [StackOverflow](https://stackoverflow.com/questions/tagged/kubernetes). Please include
   relevant tags like `#kubernetes` and `#kubeadm` so folks can help you.
-
-
 
 <!-- body -->
 
@@ -103,8 +102,7 @@ This may be caused by a number of problems. The most common are:
  1. Install Docker again following instructions
   [here](/docs/setup/production-environment/container-runtimes/#docker).
 
- 1. Change the kubelet config to match the Docker cgroup driver manually, you can refer to
-    [Configure cgroup driver used by kubelet on Master Node](/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#configure-cgroup-driver-used-by-kubelet-on-master-node)
+ 1. Change the kubelet config to match the Docker cgroup driver manually, you can refer to [Configure cgroup driver used by kubelet on control-plane node](/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#configure-cgroup-driver-used-by-kubelet-on-control-plane-node)
 
 - control plane Docker containers are crashlooping or hanging. You can check this by running `docker ps` and investigating each container by running `docker logs`.
 
@@ -365,7 +363,7 @@ kubectl taint nodes NODE_NAME node-role.kubernetes.io/master:NoSchedule-
 
 ## `/usr` is mounted read-only on nodes {#usr-mounted-read-only}
 
-On Linux distributions such as Fedora CoreOS, the directory `/usr` is mounted as a read-only filesystem.
+On Linux distributions such as Fedora CoreOS or Flatcar Container Linux, the directory `/usr` is mounted as a read-only filesystem.
 For [flex-volume support](https://github.com/kubernetes/community/blob/ab55d85/contributors/devel/sig-storage/flexvolume.md),
 Kubernetes components like the kubelet and kube-controller-manager use the default path of
 `/usr/libexec/kubernetes/kubelet-plugins/volume/exec/`, yet the flex-volume directory _must be writeable_
@@ -404,4 +402,16 @@ nodeRegistration:
 Alternatively, you can modify `/etc/fstab` to make the `/usr` mount writeable, but please
 be advised that this is modifying a design principle of the Linux distribution.
 
+## `kubeadm upgrade plan` prints out `context deadline exceeded` error message
 
+This error message is shown when upgrading a Kubernetes cluster with `kubeadm` in the case of running an external etcd. This is not a critical bug and happens because older versions of kubeadm perform a version check on the external etcd cluster. You can proceed with `kubeadm upgrade apply ...`. 
+
+This issue is fixed as of version 1.19.
+
+## `kubeadm reset` unmounts `/var/lib/kubelet`
+
+If `/var/lib/kubelet` is being mounted, performing a `kubeadm reset` will effectively unmount it.
+
+To workaround the issue, re-mount the `/var/lib/kubelet` directory after performing the `kubeadm reset` operation.
+
+This is a regression introduced in kubeadm 1.15. The issue is fixed in 1.20.

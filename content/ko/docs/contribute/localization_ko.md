@@ -125,9 +125,9 @@ weight: 10
 기존에 번역된 문서를 참고한다.
 
 {{% note %}}
-한영 병기는 페이지 내에서 해당 용어가 처음 사용되는 경우에만 1회 적용하고 이후에는 한글만 표기한다.
-한영 병기의 대상에는 제목도 포함되므로 제목에 한영 병기가 제공된 경우, 문서 내부에는
-한글만 표기한다.
+한영 병기는 페이지 내에서 해당 용어가 처음 사용될 때, 1회 적용하고 이후에는 한글만 표기한다.
+그러나 필요(예: 자연스러움, 명확성 향상 등)에 따라 추가적인 한영 병기를 허용한다.
+한영 병기의 대상에는 제목도 포함된다.
 {{% /note %}}
 
 ### API 오브젝트 용어 한글화 방침
@@ -187,7 +187,7 @@ API 오브젝트의 필드 이름, 파일 이름, 경로와 같은 내용은 독
 
 ### 기능 게이트(feature gate) 한글화 방침
 
-쿠버네티스의 [기능 게이트](/docs/reference/command-line-tools-reference/feature-gates/)를
+쿠버네티스의 [기능 게이트](/ko/docs/reference/command-line-tools-reference/feature-gates/)를
 의미하는 용어는 한글화하지 않고 원문 형태를 유지한다.
 
 기능 게이트의 예시는 다음과 같다.
@@ -198,7 +198,7 @@ API 오브젝트의 필드 이름, 파일 이름, 경로와 같은 내용은 독
 - ...
 
 전체 기능 게이트 목록은
-[여기](/docs/reference/command-line-tools-reference/feature-gates/#feature-gates)를 참고한다.
+[여기](/ko/docs/reference/command-line-tools-reference/feature-gates/#feature-gates)를 참고한다.
 
 {{% note %}}
 단, 해당 원칙에는 예외가 있을 수 있으며, 이 경우에는 가능한
@@ -295,8 +295,6 @@ Daemon | 데몬 |
 DaemonSet | 데몬셋(DaemonSet) | API 오브젝트인 경우
 Dashboard | 대시보드 |
 Data Plane | 데이터 플레인 |
-Default Limit | 기본 상한 |
-Default Request | 기본 요청량 |
 Deployment | 디플로이먼트(Deployment) | API 오브젝트인 경우
 deprecated | 사용 중단(deprecated) |
 descriptor | 디스크립터, 식별자 |
@@ -356,6 +354,7 @@ label | 레이블 |
 Lease | 리스(Lease) | API 오브젝트인 경우
 lifecycle | 라이프사이클 |
 LimitRange | 리밋레인지(LimitRange) | API 오브젝트인 경우
+limit | 한도(limit) | 리소스의 개수나 용량을 한정하기 위한 수치로 사용된 경우 선택적으로 사용 (API 오브젝트의 속성으로 limit을 사용한 경우는 가능한 영문 유지)
 Linux | 리눅스 |
 load | 부하 |
 LocalSubjectAccessReview | 로컬서브젝트액세스리뷰(LocalSubjectAccessReview) | API 오브젝트인 경우
@@ -365,7 +364,6 @@ Lost | Lost | 클레임의 상태에 한함
 Machine | 머신 |
 manifest | 매니페스트 |
 Master | 마스터 |
-max limit/request ratio | 최대 상한/요청량 비율 |
 metadata | 메타데이터 |
 metric | 메트릭 |
 masquerading | 마스커레이딩 |
@@ -418,8 +416,8 @@ ReplicaSet | 레플리카셋(ReplicaSet) | API 오브젝트인 경우
 replicas | 레플리카 |
 ReplicationController | 레플리케이션컨트롤러(ReplicationController) | API 오브젝트인 경우
 repository | 리포지터리 |
+request | 요청(request) | 리소스의 개수나 용량에 대한 요청 수치를 표현하기 위해 사용된 경우 선택적으로 사용 (API 오브젝트 속성으로 request를 사용한 경우는 가능한 영문을 유지)
 resource | 리소스 |
-Resource Limit | 리소스 상한 |
 ResourceQuota | 리소스쿼터(ResourceQuota) | API 오브젝트인 경우
 return | 반환하다 |
 revision | 리비전 |

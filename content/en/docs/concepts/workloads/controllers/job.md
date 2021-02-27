@@ -8,12 +8,12 @@ feature:
   title: Batch execution
   description: >
     In addition to services, Kubernetes can manage your batch and CI workloads, replacing containers that fail, if desired.
-weight: 60
+weight: 50
 ---
 
 <!-- overview -->
 
-A Job creates one or more Pods and ensures that a specified number of them successfully terminate.
+A Job creates one or more Pods and will continue to retry execution of the Pods until a specified number of them successfully terminate.
 As pods successfully complete, the Job tracks the successful completions.  When a specified number
 of successful completions is reached, the task (ie, Job) is complete.  Deleting a Job will clean up
 the Pods it created.
@@ -23,9 +23,6 @@ The Job object will start a new Pod if the first Pod fails or is deleted (for ex
 due to a node hardware failure or a node reboot).
 
 You can also use a Job to run multiple Pods in parallel.
-
-
-
 
 <!-- body -->
 
@@ -41,6 +38,7 @@ You can run the example with this command:
 ```shell
 kubectl apply -f https://kubernetes.io/examples/controllers/job.yaml
 ```
+The output is similar to this:
 ```
 job.batch/pi created
 ```
@@ -50,6 +48,7 @@ Check on the status of the Job with `kubectl`:
 ```shell
 kubectl describe jobs/pi
 ```
+The output is similar to this:
 ```
 Name:           pi
 Namespace:      default
@@ -94,6 +93,7 @@ To list all the Pods that belong to a Job in a machine readable form, you can us
 pods=$(kubectl get pods --selector=job-name=pi --output=jsonpath='{.items[*].metadata.name}')
 echo $pods
 ```
+The output is similar to this:
 ```
 pi-5rwd7
 ```
@@ -122,7 +122,8 @@ A Job also needs a [`.spec` section](https://git.k8s.io/community/contributors/d
 
 The `.spec.template` is the only required field of the `.spec`.
 
-The `.spec.template` is a [pod template](/docs/concepts/workloads/pods/pod-overview/#pod-templates). It has exactly the same schema as a [pod](/docs/user-guide/pods), except it is nested and does not have an `apiVersion` or `kind`.
+
+The `.spec.template` is a [pod template](/docs/concepts/workloads/pods/#pod-templates). It has exactly the same schema as a {{< glossary_tooltip text="Pod" term_id="pod" >}}, except it is nested and does not have an `apiVersion` or `kind`.
 
 In addition to required fields for a Pod, a pod template in a Job must specify appropriate
 labels (see [pod selector](#pod-selector)) and an appropriate restart policy.
@@ -215,8 +216,8 @@ To do so, set `.spec.backoffLimit` to specify the number of retries before
 considering a Job as failed. The back-off limit is set by default to 6. Failed
 Pods associated with the Job are recreated by the Job controller with an
 exponential back-off delay (10s, 20s, 40s ...) capped at six minutes. The
-back-off count is reset if no new failed Pods appear before the Job's next
-status check.
+back-off count is reset when a Job's Pod is deleted or successful without any
+other Pods for the Job failing around that time.
 
 {{< note >}}
 If your job has `restartPolicy = "OnFailure"`, keep in mind that your container running the Job
@@ -400,10 +401,11 @@ Therefore, you delete Job `old` but _leave its pods
 running_, using `kubectl delete jobs/old --cascade=false`.
 Before deleting it, you make a note of what selector it uses:
 
-```
+```shell
 kubectl get job old -o yaml
 ```
-```
+The output is similar to this:
+```yaml
 kind: Job
 metadata:
   name: old
@@ -422,7 +424,7 @@ they are controlled by Job `new` as well.
 You need to specify `manualSelector: true` in the new Job since you are not using
 the selector that the system normally generates for you automatically.
 
-```
+```yaml
 kind: Job
 metadata:
   name: new
@@ -450,7 +452,7 @@ requires only a single Pod.
 
 ### Replication Controller
 
-Jobs are complementary to [Replication Controllers](/docs/user-guide/replication-controller).
+Jobs are complementary to [Replication Controllers](/docs/concepts/workloads/controllers/replicationcontroller/).
 A Replication Controller manages Pods which are not expected to terminate (e.g. web servers), and a Job
 manages Pods that are expected to terminate (e.g. batch tasks).
 
@@ -474,4 +476,3 @@ object, but maintains complete control over what Pods are created and how work i
 ## Cron Jobs {#cron-jobs}
 
 You can use a [`CronJob`](/docs/concepts/workloads/controllers/cron-jobs/) to create a Job that will run at specified times/dates, similar to the Unix tool `cron`.
-

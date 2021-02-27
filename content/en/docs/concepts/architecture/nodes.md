@@ -11,9 +11,10 @@ weight: 10
 
 Kubernetes runs your workload by placing containers into Pods to run on _Nodes_.
 A node may be a virtual or physical machine, depending on the cluster. Each node
-contains the services necessary to run
-{{< glossary_tooltip text="Pods" term_id="pod" >}}, managed by the
-{{< glossary_tooltip text="control plane" term_id="control-plane" >}}.
+is managed by the
+{{< glossary_tooltip text="control plane" term_id="control-plane" >}}
+and contains the services necessary to run
+{{< glossary_tooltip text="Pods" term_id="pod" >}}
 
 Typically you have several nodes in a cluster; in a learning or resource-limited
 environment, you might have just one.
@@ -22,8 +23,6 @@ The [components](/docs/concepts/overview/components/#node-components) on a node 
 {{< glossary_tooltip text="kubelet" term_id="kubelet" >}}, a
 {{< glossary_tooltip text="container runtime" term_id="container-runtime" >}}, and the
 {{< glossary_tooltip text="kube-proxy" term_id="kube-proxy" >}}.
-
-
 
 <!-- body -->
 
@@ -100,7 +99,7 @@ You can modify Node objects regardless of the setting of `--register-node`.
 For example, you can set labels on an existing Node, or mark it unschedulable.
 
 You can use labels on Nodes in conjunction with node selectors on Pods to control
-scheduling. For example, you can to constrain a Pod to only be eligible to run on
+scheduling. For example, you can constrain a Pod to only be eligible to run on
 a subset of the available nodes.
 
 Marking a node as unschedulable prevents the scheduler from placing new pods onto
@@ -195,7 +194,7 @@ The node lifecycle controller automatically creates
 The scheduler takes the Node's taints into consideration when assigning a Pod to a Node.
 Pods can also have tolerations which let them tolerate a Node's taints.
 
-See [Taint Nodes by Condition](/docs/concepts/configuration/taint-and-toleration/#taint-nodes-by-condition)
+See [Taint Nodes by Condition](/docs/concepts/scheduling-eviction/taint-and-toleration/#taint-nodes-by-condition)
 for more details.
 
 ### Capacity and Allocatable {#capacity}
@@ -244,7 +243,7 @@ checks the state of each node every `--node-monitor-period` seconds.
 Heartbeats, sent by Kubernetes nodes, help determine the availability of a node.
 
 There are two forms of heartbeats: updates of `NodeStatus` and the
-[Lease object](/docs/reference/generated/kubernetes-api/{{< latest-version >}}/#lease-v1-coordination-k8s-io).
+[Lease object](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#lease-v1-coordination-k8s-io).
 Each Node has an associated Lease object in the `kube-node-lease`
 {{< glossary_tooltip term_id="namespace" text="namespace">}}.
 Lease is a lightweight resource, which improves the performance
@@ -263,7 +262,7 @@ a Lease object.
 
 #### Reliability
 
- In most cases, node controller limits the eviction rate to
+ In most cases, the node controller limits the eviction rate to
 `--node-eviction-rate` (default 0.1) per second, meaning it won't evict pods
 from more than 1 node per 10 seconds.
 
@@ -332,6 +331,26 @@ the kubelet can use topology hints when making resource assignment decisions.
 See [Control Topology Management Policies on a Node](/docs/tasks/administer-cluster/topology-manager/)
 for more information.
 
+## Graceful Node Shutdown {#graceful-node-shutdown}
+
+{{< feature-state state="alpha" for_k8s_version="v1.20" >}}
+
+If you have enabled the `GracefulNodeShutdown` [feature gate](/docs/reference/command-line-tools-reference/feature-gates/), then the kubelet attempts to detect the node system shutdown and terminates pods running on the node.
+Kubelet ensures that pods follow the normal [pod termination process](/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination) during the node shutdown.
+
+When the `GracefulNodeShutdown` feature gate is enabled, kubelet uses [systemd inhibitor locks](https://www.freedesktop.org/wiki/Software/systemd/inhibit/) to delay the node shutdown with a given duration. During a shutdown kubelet terminates pods in two phases:
+
+1. Terminate regular pods running on the node.
+2. Terminate [critical pods](/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/#marking-pod-as-critical) running on the node.
+
+Graceful Node Shutdown feature is configured with two [`KubeletConfiguration`](/docs/tasks/administer-cluster/kubelet-config-file/) options:
+* `ShutdownGracePeriod`:
+  * Specifies the total duration that the node should delay the shutdown by. This is the total grace period for pod termination for both regular and [critical pods](/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/#marking-pod-as-critical).
+* `ShutdownGracePeriodCriticalPods`:
+  * Specifies the duration used to terminate [critical pods](/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/#marking-pod-as-critical) during a node shutdown. This should be less than `ShutdownGracePeriod`.
+
+For example, if `ShutdownGracePeriod=30s`, and `ShutdownGracePeriodCriticalPods=10s`, kubelet will delay the node shutdown by 30 seconds. During the shutdown, the first 20 (30-10) seconds would be reserved for gracefully terminating normal pods, and the last 10 seconds would be reserved for terminating [critical pods](/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/#marking-pod-as-critical).
+
 
 ## {{% heading "whatsnext" %}}
 
@@ -339,6 +358,5 @@ for more information.
 * Read the [API definition for Node](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#node-v1-core).
 * Read the [Node](https://git.k8s.io/community/contributors/design-proposals/architecture/architecture.md#the-kubernetes-node)
   section of the architecture design document.
-* Read about [taints and tolerations](/docs/concepts/configuration/taint-and-toleration/).
-* Read about [cluster autoscaling](/docs/tasks/administer-cluster/cluster-management/#cluster-autoscaling).
+* Read about [taints and tolerations](/docs/concepts/scheduling-eviction/taint-and-toleration/).
 

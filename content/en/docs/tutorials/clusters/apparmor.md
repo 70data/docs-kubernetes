@@ -1,8 +1,9 @@
 ---
 reviewers:
 - stclair
-title: AppArmor
+title: Restrict a Container's Access to Resources with AppArmor
 content_type: tutorial
+weight: 10
 ---
 
 <!-- overview -->
@@ -167,8 +168,7 @@ k8s-apparmor-example-deny-write (enforce)
 
 *This example assumes you have already set up a cluster with AppArmor support.*
 
-First, we need to load the profile we want to use onto our nodes. The profile we'll use simply
-denies all file writes:
+First, we need to load the profile we want to use onto our nodes. This profile denies all file writes:
 
 ```shell
 #include <tunables/global>
